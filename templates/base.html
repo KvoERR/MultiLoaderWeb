@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Возможность переопределения заголовка -->
+    <title>{% block title %}MultiLoader{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>MultiLoader</h1>
+    </header>
+
+    <main>
+        <fieldset>
+            <legend>Выберите интересы:</legend>
+            
+            <label>
+                <input type="checkbox" name="interests" value="sports"> Спорт
+            </label>
+            
+            <label>
+                <input type="checkbox" name="interests" value="music"> Музыка
+            </label>
+            
+            <label>
+                <input type="checkbox" name="interests" value="books"> Книги
+            </label>
+        </fieldset>
+    </main>
+
+    <footer>
+    </footer>
+</body>
+</html>
