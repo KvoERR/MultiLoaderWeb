@@ -5,13 +5,7 @@ header {
     padding: 20px 0;
     background-color: orange; /* опционально */
 }
-main form {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    justify-content: center;
-    align-items: center;
-}
+
 .form-container {
     display: flex;
     gap: 20px;
@@ -20,11 +14,18 @@ main form {
 }
 
 .video-info {
-    flex: 0 1 400px;
+    flex: 0 1 500px;
 }
 
 .platforms {
-    flex: 0 1 300px;
+    flex: 0 1 150px;
+}
+
+button {
+    flex: 0 1 150px;
+    /*display: block;*/
+    margin: auto 0 auto 0; /* ← auto по бокам центрирует */
+    padding: 12px 24px;
 }
 
 .form-group {
@@ -42,6 +43,15 @@ main form {
 .platforms label {
     display: block;
     margin-bottom: 10px;
+}
+
+
+
+.result {
+    width: 100%;
+    max-width: 600px; 
+    margin: 20px auto 0 auto; 
+    text-align: center; 
 }
 
 /* Адаптивность 

@@ -7,11 +7,12 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 from traitlets import This
 
-class YouTubeVideoUploader:
+class VideoUploader:
     # Настройки OAuth 2.0
     SCOPES = ['https://www.googleapis.com/auth/youtube.upload']
     CLIENT_SECRETS_FILE = 'client_secret.json'  # Файл с учетными данными OAuth 2.0
 
+    @staticmethod
     def get_authenticated_service(self):
         #Аутентификация и создание сервиса YouTube
         creds = None
@@ -35,7 +36,8 @@ class YouTubeVideoUploader:
                 token.write(creds.to_json())
     
         return build('youtube', 'v3', credentials=creds)
-
+    
+    @staticmethod
     def upload_video(self, video_file, title, description, category_id="22", privacy_status="private", tags=None):
         # Создаем сервис YouTube
         youtube = self.authenticated_service()
