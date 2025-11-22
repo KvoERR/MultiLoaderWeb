@@ -13,24 +13,59 @@
     </header>
 
     <main>
-        <fieldset>
-            <legend>Выберите интересы:</legend>
+        <form class="upload-form" id="uploadForm">
+            <div class="form-container">
+                <div class="video-info">
+                    <p>Информация</p>
+                    <div class="form-group">
+                        <input type="text" id="title" name="title" placeholder="Название" required>
+                    </div>
+
+                    <div class="form-group">
+                        <textarea id="description" name="description" placeholder="Описание" rows="4" style="resize: none;"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category">Категория:</label>
+                        <select id="category" name="category">
+                            <option value="">Выберите категорию</option>
+                            <option value="education">Образование</option>
+                            <option value="entertainment">Развлечения</option>
+                            <option value="music">Музыка</option>
+                            <option value="sports">Спорт</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="platforms">
+                    <p>Плтаформы</p>
+                    <label>
+                        <input type="checkbox" name="platforms" value="youtube"> YouTube
+                    </label>
+                    
+                    <label>
+                        <input type="checkbox" name="platforms" value="vk"> VK Видео
+                    </label>
+                    
+                    <label>
+                        <input type="checkbox" name="platforms" value="telegram"> Telegram
+                    </label>
+
+                    <label>
+                        <input type="checkbox" name="platforms" value="yandex"> Яндекс Дзен
+                    </label>
+                    <button type="button" onclick="submitForm()">Обработать данные</button>
+                </div>
+            </div>
             
-            <label>
-                <input type="checkbox" name="interests" value="sports"> Спорт
-            </label>
-            
-            <label>
-                <input type="checkbox" name="interests" value="music"> Музыка
-            </label>
-            
-            <label>
-                <input type="checkbox" name="interests" value="books"> Книги
-            </label>
-        </fieldset>
+        </form>
+
+        <div id="result" class="result"></div>
+    </div>
     </main>
 
     <footer>
     </footer>
+    <script src="{{ url_for('static', filename='js/form-handler.js') }}"></script>
 </body>
 </html>
