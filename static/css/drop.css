@@ -1,0 +1,62 @@
+.drop-zone {
+    width: 100%;
+    padding: 20px 00px;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #fafafa;
+}
+
+.drop-zone:hover {
+    border-color: #007bff;
+    background: #f0f8ff;
+}
+
+.drop-zone.dragover {
+    border-color: #007bff;
+    background: #e6f3ff;
+    transform: scale(1.02);
+}
+
+.drop-icon {
+    font-size: 3rem;
+    display: block;
+}
+
+.drop-zone p {
+    margin: 5px 0;
+    color: #666;
+}
+
+.drop-subtitle {
+    font-size: 0.9rem;
+    color: #999;
+}
+
+.browse-btn:hover {
+    text-decoration: underline;
+}
+
+.file-info {
+    margin-top: 10px;
+    padding: 10px;
+    background: #e8f5e8;
+    border-radius: 4px;
+    display: none;
+}
+
+.file-info.show {
+    display: block;
+}
+
+.file-name {
+    font-weight: bold;
+    color: #2d5016;
+}
+
+.file-size {
+    color: #666;
+    font-size: 0.9rem;
+}

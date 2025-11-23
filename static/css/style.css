@@ -2,7 +2,7 @@ header {
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 20px 0;
+    padding: 20px;
     background-color: orange; /* опционально */
 }
 
@@ -13,6 +13,12 @@ header {
     align-items: flex-start;
 }
 
+.form-group {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    align-items: flex-start;
+}
 .video-info {
     flex: 0 1 500px;
 }
@@ -21,10 +27,13 @@ header {
     flex: 0 1 150px;
 }
 
+.platforms label {
+    display: block;
+    margin-bottom: 10px;
+}
+
 button {
-    flex: 0 1 150px;
-    /*display: block;*/
-    margin: auto 0 auto 0; /* ← auto по бокам центрирует */
+
     padding: 12px 24px;
 }
 
@@ -40,13 +49,6 @@ button {
     box-sizing: border-box;
 }
 
-.platforms label {
-    display: block;
-    margin-bottom: 10px;
-}
-
-
-
 .result {
     width: 100%;
     max-width: 600px; 
@@ -54,9 +56,8 @@ button {
     text-align: center; 
 }
 
-/* Адаптивность 
-@media (max-width: 768px) {
+@media (max-width: 7px) {
     .form-container {
         flex-direction: column;
     }
-}*/
+}
