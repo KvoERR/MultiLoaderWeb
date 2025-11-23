@@ -1,0 +1,11 @@
+.env
+.env.local
+.env.production
+config/secrets.yml
+
+*.key
+*.pem
+*.crt
+
+*.log
+node_modules/
