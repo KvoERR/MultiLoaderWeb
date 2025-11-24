@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify
-import controller
+from utils import VK, YouTube
 
 
 app = Flask(__name__)
@@ -36,7 +36,13 @@ def process_form():
             })
         
         # Обрабатываем данные (ваша бизнес-логика)
-        result = process_video_data(title, description, category, platforms)
+        result = YouTube.VideoUploader.upload_video(
+            video_file=video,
+            title=title,
+            description=description,
+            category_id=category,
+            privacy_status="private", 
+        )
         
         print("Данные успешно обработаны, отправляем ответ")
         

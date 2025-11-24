@@ -1,5 +1,5 @@
 from utils import VK, YouTube
-def process_video_data(title, description, category, platforms, file, image, tags):
+def process_video_data(title, description, category, file, image, tags):
 
     YouTube.VideoUploader.upload_video(
         file,

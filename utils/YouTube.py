@@ -5,7 +5,6 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
-from traitlets import This
 
 class VideoUploader:
     # Настройки OAuth 2.0
@@ -38,10 +37,11 @@ class VideoUploader:
         return build('youtube', 'v3', credentials=creds)
     
     @staticmethod
-    def upload_video(self, video_file, title, description, category_id="22", privacy_status="private", tags=None):
+    def upload_video(self, video_file, title, description, category_id="22", 
+                    privacy_status="private", tags=None, thumbnail_file=None):
         # Создаем сервис YouTube
         youtube = self.authenticated_service()
-    
+
         # Метаданные видео
         body = {
             'snippet': {
@@ -52,37 +52,58 @@ class VideoUploader:
             },
             'status': {
                 'privacyStatus': privacy_status,
-                # Дополнительные настройки статуса
                 'selfDeclaredMadeForKids': False
             }
         }
-    
-        # Создаем медиа-объект для загрузки
+
+        # Создаем медиа-объект для загрузки видео
         media = MediaFileUpload(
             video_file,
             chunksize=1024*1024,
             resumable=True
         )
-    
-        # Выполняем запрос на загрузку
+
+        # Выполняем запрос на загрузку видео
         request = youtube.videos().insert(
             part=','.join(body.keys()),
             body=body,
             media_body=media
         )
-    
-        # Выполняем загрузку
+
+        # Выполняем загрузку видео
         response = None
         while response is None:
             status, response = request.next_chunk()
             if status:
                 print(f"Загружено {int(status.progress() * 100)}%")
-    
-        print("Загрузка завершена!")
-        print(f"ID видео: {response['id']}")
-        print(f"Название: {response['snippet']['title']}")
-        print(f"Ссылка: https://www.youtube.com/watch?v={response['id']}")
-    
+
+        video_id = response['id']
+        print("Загрузка видео завершена!")
+        print(f"ID видео: {video_id}")
+        print(f"Ссылка: https://www.youtube.com/watch?v={video_id}")
+
+        if thumbnail_file:
+            try:
+                print("Загружаем обложку для видео...")
+                
+                # Создаем медиа-объект для обложки
+                thumbnail_media = MediaFileUpload(
+                    thumbnail_file,
+                    mimetype='image/jpeg'  # Автоматически определит тип
+                )
+                
+                # Загружаем обложку
+                youtube.thumbnails().set(
+                    videoId=video_id,
+                    media_body=thumbnail_media
+                ).execute()
+                
+                print("✅ Обложка успешно загружена!")
+                
+            except Exception as e:
+                print(f"⚠️ Ошибка загрузки обложки: {e}")
+                # Не прерываем выполнение, т.к. видео уже загружено
+
         return response
 
 
@@ -109,7 +130,7 @@ if __name__ == "__main__":
     # 28 - Science & Technology
     
     # Загружаем видео
-    YouTubeVideoUploader.upload_video(
+    VideoUploader.upload_video(
         video_file=video_path,
         title=video_title,
         description=video_description,
