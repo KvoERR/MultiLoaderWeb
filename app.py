@@ -18,9 +18,9 @@ def process_form():
         description = request.form.get('description', '').strip()
         category = request.form.get('category', '')
         platforms = request.form.getlist('platforms')
-        timestamp = request.form.get('timestamp', '')
+        video = request.files['videoFile']
         
-        print(f"Данные от клиента: title={title}, category={category}, platforms={platforms}")
+        print(f"Данные от клиента: title={title}, category={category}, platforms={platforms}, video={video}")
         
         # Валидация данных
         if not title:

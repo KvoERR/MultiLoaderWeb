@@ -3,14 +3,10 @@ function submitForm() {
     
     // Находим элементы
     const form = document.getElementById('uploadForm');
+    const fileInput = document.getElementById('videoFile');
+    const imageInput = document.getElementById('imageFile');
     const resultDiv = document.getElementById('result');
     const button = event.target; // Кнопка, на которую нажали
-    
-    // Проверяем, что элементы найдены
-    if (!form) {
-        console.error('Форма не найдена!');
-        return;
-    }
     
     // Показываем загрузку
     button.disabled = true;
@@ -20,17 +16,17 @@ function submitForm() {
         resultDiv.style.display = 'none';
     }
     
+    const file = fileInput.files[0];
+
     // Собираем данные формы
     const formData = new FormData(form);
-    
-    // Добавляем дополнительную информацию (опционально)
-    formData.append('timestamp', new Date().toISOString());
     
     console.log('Отправляем данные:', {
         title: formData.get('title'),
         description: formData.get('description'),
         category: formData.get('category'),
-        platforms: formData.getAll('platforms')
+        platforms: formData.getAll('platforms'),
+        video: file.name
     });
     
     // Отправляем AJAX запрос во Flask
