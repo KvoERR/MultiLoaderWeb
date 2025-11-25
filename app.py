@@ -8,6 +8,10 @@ app = Flask(__name__)
 def home():
     return render_template('base.html')
 
+@app.route('/autotag', methods=['GET'])
+def tags_generation():
+    
+
 @app.route('/process', methods=['POST'])
 def process_form():
     try:

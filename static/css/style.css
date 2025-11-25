@@ -32,8 +32,7 @@ header {
     margin-bottom: 10px;
 }
 
-button {
-
+.platforms button {
     padding: 12px 24px;
 }
 
@@ -47,6 +46,13 @@ button {
     width: 100%;
     padding: 8px;
     box-sizing: border-box;
+}
+
+.form-group button {
+    white-space: nowrap;
+    width: auto;
+    padding: 8px;
+    min-width: 100px;
 }
 
 .result {

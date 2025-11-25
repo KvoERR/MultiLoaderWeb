@@ -1,0 +1,30 @@
+.radio-container {
+    display: block;
+    width: 100%;
+}
+
+.radio-title {
+    display: block;
+    margin-bottom: 10px;
+}
+
+.radio-choice {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    margin: 5px;
+}
+
+.radio-choice input{
+    width: 10%;
+}
+
+.radio-choice:hover {
+    border-color: #007bff;
+    background: #f0f8ff;
+}
+
+.radio-choice input[type="radio"] {
+    margin-right: 12px;
+    transform: scale(1.2);
+}

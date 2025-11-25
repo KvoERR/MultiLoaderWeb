@@ -7,6 +7,7 @@
     <title>{% block title %}MultiLoader{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/drop.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/radio.css') }}">
 </head>
 <body>
     <header>
@@ -54,8 +55,27 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="form-group">
+                        <button type="button" onclick="autoTag()">Авто-тэг</button>
+                        <input type="text" id="tagList" name="tags" placeholder="Тэги" required>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="radio-container">
+                            <label class="radio-title">Выберите уровень доступа:</label>
+                            <div class="radio-choice">
+                                <input type="radio" id="public" name="privacy" value="public" checked>
+                                <label for="public">Открытый доступ</label>
+                            </div>
+                                
+                            <div class="radio-choice">
+                                <input type="radio" id="private" name="privacy" value="private">
+                                <label for="private">Закрытый доступ</label>
+                            </div>    
+                        </div>   
+                    </div>
                     <!-- TODO Добавить тэги-->
-                    <!-- TODO Добавить приватность-->
                 </div>
                 
                 <div class="platforms">
