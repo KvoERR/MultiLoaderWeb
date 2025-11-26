@@ -9,19 +9,17 @@ from googleapiclient.http import MediaFileUpload
 class VideoUploader:
     # Настройки OAuth 2.0
     SCOPES = ['https://www.googleapis.com/auth/youtube.upload']
-    CLIENT_SECRETS_FILE = 'utils\client_secret.json'  # Файл с учетными данными OAuth 2.0
+    CLIENT_SECRETS_FILE = 'secrets\client_secret.json'  # Файл с учетными данными OAuth 2.0
 
     @staticmethod
     def get_authenticated_service(self):
-        print("Текущая директория:", os.getcwd())
-        print("Файлы в директории:", os.listdir('.'))
-        print("Существует ли client_secret.json:", os.path.exists('client_secret.json'))
         #Аутентификация и создание сервиса YouTube
         creds = None
     
         # Файл token.json сохраняет токены доступа/обновления
-        if os.path.exists('token.json'):
-            creds = Credentials.from_authorized_user_file('token.json', self.SCOPES)
+        
+        if os.path.exists('secrets/token.json'):
+            creds = Credentials.from_authorized_user_file('secrets/token.json', self.SCOPES)
     
         # Если нет валидных учетных данных, запрашиваем авторизацию
         if not creds or not creds.valid:
@@ -34,7 +32,7 @@ class VideoUploader:
                 creds = flow.run_local_server(port=0)
         
             # Сохраняем учетные данные для следующего запуска
-            with open('token.json', 'w') as token:
+            with open('secrets/token.json', 'w') as token:
                 token.write(creds.to_json())
     
         return build('youtube', 'v3', credentials=creds)

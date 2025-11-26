@@ -1,3 +1,4 @@
+import tempfile
 from flask import Flask, render_template, request, jsonify
 from utils import VK, YouTube
 
@@ -16,57 +17,75 @@ def   tags_generation():
         print("Получен запрос на /autotag")
 '''
 
+def get_file_path(file_storage):
+    mime_to_text = {
+        'video/mp4': '.mp4',
+        'video/avi': '.avi',
+        'video/mov': '.mov',
+        'video/webm': '.webm',
+        'image/jpeg': '.jpg',
+        'image/png': '.png',
+        'image/gif': '.gif',
+        'image/webp': '.webp'
+    }
+    extension = mime_to_text.get(file_storage, '.bin')
+    
+    # Создаем временный файл с правильным расширением
+    with tempfile.NamedTemporaryFile(delete=False, suffix=extension) as temp_file:
+        file_storage.save(temp_file.name)
+        return temp_file.name  # Возвращаем путь к файлу
+
 @app.route('/process', methods=['POST'])
 def process_form():
     try:
-        print("Получен запрос на /process")
-        
-        # Получаем данные из формы
         title = request.form.get('title', '').strip()
         description = request.form.get('description', '').strip()
         category = request.form.get('category', '')
-        video = request.files['video']
-        image = request.files['image']
+        video_file = request.files.get('video')
+        image_file = request.files.get('image')
         tags = request.form.get('tags', '').strip()
         privacy = request.form.get('privacy', '')
         platforms = request.form.getlist('platforms')
+
+        ''' Тест POST запроса
+        print(f"Данные от клиента: title={title}, category={category}, video={video_file}, image={image_file}, tags={tags}, privacy={privacy}, platforms={platforms}")
+        '''
         
         
-        print(f"Данные от клиента: title={title}, category={category}, video={video}, image={image}, tags={tags}, privacy={privacy}, platforms={platforms}")
-        
-        # Валидация данных
         if not title:
             return jsonify({
                 'success': False,
                 'error': 'Название не может быть пустым'
             })
-        
+        if not video_file:
+            return jsonify({
+                'success': False,
+                'error': 'Нужно загрузить видео'
+            }) 
         if not platforms:
             return jsonify({
                 'success': False,
                 'error': 'Выберите хотя бы одну платформу'
             })
         
+        video_path=get_file_path(video_file)
+        image_path=get_file_path(image_file)
         # Обрабатываем данные (ваша бизнес-логика)
         result = YouTube.VideoUploader.upload_video(
             self=YouTube.VideoUploader,
             title=title,
             description=description,
-            video=video,
-            image=image,
+            video=video_path,
+            image=image_path,
             tags=tags,
             privacy=privacy,
             category=category
-        )
-        
-        print("Данные успешно обработаны, отправляем ответ")
-        
+        ) 
         return jsonify({
             'success': True,
             'result': result,
             'message': 'Данные успешно получены и обработаны'
-        })
-    
+        }) 
     except Exception as e:
         print(f"Ошибка при обработке формы: {str(e)}")
         return jsonify({
