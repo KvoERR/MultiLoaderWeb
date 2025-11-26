@@ -2,15 +2,19 @@ from flask import Flask, render_template, request, jsonify
 from utils import VK, YouTube
 
 
+
 app = Flask(__name__)
 
 @app.route('/')
 def home():
     return render_template('base.html')
 
-@app.route('/autotag', methods=['GET'])
-def tags_generation():
-    
+
+'''@app.route('/autotag', methods=['GET'])
+def   tags_generation():
+    try:
+        print("Получен запрос на /autotag")
+'''
 
 @app.route('/process', methods=['POST'])
 def process_form():
@@ -21,10 +25,14 @@ def process_form():
         title = request.form.get('title', '').strip()
         description = request.form.get('description', '').strip()
         category = request.form.get('category', '')
+        video = request.files['video']
+        image = request.files['image']
+        tags = request.form.get('tags', '').strip()
+        privacy = request.form.get('privacy', '')
         platforms = request.form.getlist('platforms')
-        video = request.files['videoFile']
         
-        print(f"Данные от клиента: title={title}, category={category}, platforms={platforms}, video={video}")
+        
+        print(f"Данные от клиента: title={title}, category={category}, video={video}, image={image}, tags={tags}, privacy={privacy}, platforms={platforms}")
         
         # Валидация данных
         if not title:
@@ -41,11 +49,14 @@ def process_form():
         
         # Обрабатываем данные (ваша бизнес-логика)
         result = YouTube.VideoUploader.upload_video(
-            video_file=video,
+            self=YouTube.VideoUploader,
             title=title,
             description=description,
-            category_id=category,
-            privacy_status="private", 
+            video=video,
+            image=image,
+            tags=tags,
+            privacy=privacy,
+            category=category
         )
         
         print("Данные успешно обработаны, отправляем ответ")
@@ -55,7 +66,7 @@ def process_form():
             'result': result,
             'message': 'Данные успешно получены и обработаны'
         })
-        
+    
     except Exception as e:
         print(f"Ошибка при обработке формы: {str(e)}")
         return jsonify({

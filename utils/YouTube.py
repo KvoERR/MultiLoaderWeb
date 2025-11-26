@@ -9,10 +9,13 @@ from googleapiclient.http import MediaFileUpload
 class VideoUploader:
     # Настройки OAuth 2.0
     SCOPES = ['https://www.googleapis.com/auth/youtube.upload']
-    CLIENT_SECRETS_FILE = 'client_secret.json'  # Файл с учетными данными OAuth 2.0
+    CLIENT_SECRETS_FILE = 'utils\client_secret.json'  # Файл с учетными данными OAuth 2.0
 
     @staticmethod
     def get_authenticated_service(self):
+        print("Текущая директория:", os.getcwd())
+        print("Файлы в директории:", os.listdir('.'))
+        print("Существует ли client_secret.json:", os.path.exists('client_secret.json'))
         #Аутентификация и создание сервиса YouTube
         creds = None
     
@@ -37,10 +40,10 @@ class VideoUploader:
         return build('youtube', 'v3', credentials=creds)
     
     @staticmethod
-    def upload_video(self, video_file, title, description, category_id="22", 
-                    privacy_status="private", tags=None, thumbnail_file=None):
+    def upload_video(self, title, description, video, image,
+                    tags, privacy="private", category="22"):
         # Создаем сервис YouTube
-        youtube = self.authenticated_service()
+        youtube = self.get_authenticated_service(VideoUploader)
 
         # Метаданные видео
         body = {
@@ -48,17 +51,17 @@ class VideoUploader:
                 'title': title,
                 'description': description,
                 'tags': tags or [],
-                'categoryId': category_id
+                'categoryId': category
             },
             'status': {
-                'privacyStatus': privacy_status,
+                'privacyStatus': privacy,
                 'selfDeclaredMadeForKids': False
             }
         }
 
         # Создаем медиа-объект для загрузки видео
         media = MediaFileUpload(
-            video_file,
+            video,
             chunksize=1024*1024,
             resumable=True
         )
@@ -82,13 +85,13 @@ class VideoUploader:
         print(f"ID видео: {video_id}")
         print(f"Ссылка: https://www.youtube.com/watch?v={video_id}")
 
-        if thumbnail_file:
+        if image:
             try:
                 print("Загружаем обложку для видео...")
                 
                 # Создаем медиа-объект для обложки
                 thumbnail_media = MediaFileUpload(
-                    thumbnail_file,
+                    image,
                     mimetype='image/jpeg'  # Автоматически определит тип
                 )
                 

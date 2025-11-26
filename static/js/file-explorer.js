@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const uploadConfigs = [
         {
             dropZoneId: 'videoDropZone',
-            fileInputId: 'videoFile',
+            fileInputId: 'video',
             browseBtnId: 'videoBrowseBtn',
             fileInfoId: 'fileInfo',
             acceptType: 'video/',
@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
         },
         {
             dropZoneId: 'imageDropZone', 
-            fileInputId: 'imageFile',
+            fileInputId: 'image',
             browseBtnId: 'imageBrowseBtn',
             fileInfoId: 'fileInfo',
             acceptType: 'image/',
