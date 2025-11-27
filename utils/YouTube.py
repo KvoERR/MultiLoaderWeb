@@ -6,50 +6,85 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload
 
+def get_category_id(category):
+        category_to_id = {
+        'Film & Animation':'1',
+        'Cars & Vehicles':'2',
+        'Music':'10',
+        'Pets & Animals':'15',
+        'Sport':'17',
+        'Travel & Events':'19',
+        'Gaming':'20',
+        'People & Blogs':'22',
+        'Comedy':'23',
+        'Entertainment':'24',
+        'News & Politics':'25',
+        'How-to & Style':'26',
+        'Education':'27',
+        'Science & Technology':'28',
+        'Non-profits & Activism':'29'
+        }
+        return category_to_id.get(category, '22')
 class VideoUploader:
-    # Настройки OAuth 2.0
     SCOPES = ['https://www.googleapis.com/auth/youtube.upload']
-    CLIENT_SECRETS_FILE = 'secrets\client_secret.json'  # Файл с учетными данными OAuth 2.0
+    CLIENT_SECRETS_FILE = 'secrets/client_secret.json'
 
     @staticmethod
-    def get_authenticated_service(self):
-        #Аутентификация и создание сервиса YouTube
+    def get_authenticated_service():
         creds = None
-    
-        # Файл token.json сохраняет токены доступа/обновления
+        token_path = 'secrets/token.json'
         
-        if os.path.exists('secrets/token.json'):
-            creds = Credentials.from_authorized_user_file('secrets/token.json', self.SCOPES)
-    
-        # Если нет валидных учетных данных, запрашиваем авторизацию
+        # Загружаем существующий токен
+        if os.path.exists(token_path):
+            try:
+                creds = Credentials.from_authorized_user_file(token_path, VideoUploader.SCOPES)
+            except Exception as e:
+                print(f"Ошибка загрузки токена: {e}")
+                os.remove(token_path)  # Удаляем поврежденный токен
+                creds = None
+        
+        # Если нет валидных учетных данных
         if not creds or not creds.valid:
             if creds and creds.expired and creds.refresh_token:
-                creds.refresh(Request()) # Обновляем истекший токен
+                try:
+                    creds.refresh(Request())
+                except Exception as e:
+                    print(f"Ошибка обновления токена: {e}")
+                    creds = None
             else:
-                # Запрашиваем новые учетные данные
+                # Новая авторизация с получением refresh_token
                 flow = InstalledAppFlow.from_client_secrets_file(
-                    self.CLIENT_SECRETS_FILE, self.SCOPES)
-                creds = flow.run_local_server(port=0)
-        
-            # Сохраняем учетные данные для следующего запуска
-            with open('secrets/token.json', 'w') as token:
+                    VideoUploader.CLIENT_SECRETS_FILE, 
+                    VideoUploader.SCOPES
+                )
+                creds = flow.run_local_server(
+                    port=0,
+                    access_type='offline',  # Получаем refresh_token
+                    include_granted_scopes='true'
+                )
+            
+            # Сохраняем новые учетные данные
+            os.makedirs('secrets', exist_ok=True)
+            with open(token_path, 'w') as token:
                 token.write(creds.to_json())
-    
+            print("Токен сохранен с refresh_token")
+        
         return build('youtube', 'v3', credentials=creds)
     
     @staticmethod
-    def upload_video(self, title, description, video, image,
-                    tags, privacy="private", category="22"):
+    def upload_video(title, description, category, video, image,
+                    tags, privacy="private"):
         # Создаем сервис YouTube
-        youtube = self.get_authenticated_service(VideoUploader)
-
+        youtube = VideoUploader.get_authenticated_service()
+    
+        category_id = get_category_id(category)
         # Метаданные видео
         body = {
             'snippet': {
                 'title': title,
                 'description': description,
                 'tags': tags or [],
-                'categoryId': category
+                'categoryId': category_id
             },
             'status': {
                 'privacyStatus': privacy,
@@ -116,19 +151,23 @@ if __name__ == "__main__":
     video_description = "Это видео было загружено с помощью YouTube Data API."
     
     # Категории YouTube:
-    # 1 - Film & Animation
-    # 2 - Autos & Vehicles  
-    # 10 - Music
-    # 15 - Pets & Animals
-    # 17 - Sports
-    # 20 - Gaming
-    # 22 - People & Blogs
-    # 23 - Comedy
-    # 24 - Entertainment
-    # 25 - News & Politics
-    # 26 - Howto & Style
-    # 27 - Education
-    # 28 - Science & Technology
+    '''
+    1 - Film & Animation
+    2 - Cars & Vehicles
+    10 - Music
+    15 - Pets & Animals
+    17 - Sport
+    19 - Travel & Events
+    20 - Gaming
+    22 - People & Blogs
+    23 - Comedy
+    24 - Entertainment
+    25 - News & Politics
+    26 - How-to & Style
+    27 - Education
+    28 - Science & Technology
+    29 - Non-profits & Activism
+    '''
     
     # Загружаем видео
     VideoUploader.upload_video(

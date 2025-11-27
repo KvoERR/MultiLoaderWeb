@@ -64,10 +64,6 @@ function showSuccess(result) {
     resultDiv.className = 'result success';
     resultDiv.innerHTML = `
         <h3>✅ Данные успешно обработаны!</h3>
-        <p><strong>Название:</strong> ${result.title || 'Не указано'}</p>
-        <p><strong>Описание:</strong> ${result.description || 'Не указано'}</p>
-        <p><strong>Категория:</strong> ${result.category_name || 'Не выбрана'}</p>
-        <p><strong>Платформы:</strong> ${result.platforms_str || 'Не выбраны'}</p>
         <p><small>Запрос обработан: ${new Date().toLocaleString()}</small></p>
     `;
     resultDiv.style.display = 'block';

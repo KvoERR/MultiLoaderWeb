@@ -72,7 +72,6 @@ def process_form():
         image_path=get_file_path(image_file)
         # Обрабатываем данные (ваша бизнес-логика)
         result = YouTube.VideoUploader.upload_video(
-            self=YouTube.VideoUploader,
             title=title,
             description=description,
             video=video_path,
