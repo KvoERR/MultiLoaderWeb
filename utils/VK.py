@@ -2,58 +2,35 @@
 from vk_api.upload import VkUpload
 import os
 import requests
+import webbrowser
+import threading
+import time
 
-class VKVideoUploader:
+class VideoUploader:
+    token_storage={}
+    app_id="54311529"
     def __init__(self, access_token):
-        # Инициализация VK API
         self.session = vk_api.VkApi(token=access_token)
         self.upload = VkUpload(self.session)
         self.api = self.session.get_api()
 
     @staticmethod
-    def get_token(app_id):
-        auth_url = (
-            f"https://oauth.vk.com/authorize?"
-            f"client_id={app_id}&"
-            f"display=page&"
-            f"redirect_uri=https://oauth.vk.com/blank.html&"
-            f"scope=video,offline&"
-            f"response_type=token&"
-            f"v=5.199"
-        )
+    def get_token():
+        auth_url = (f"https://oauth.vk.com/authorize?"
+                f"client_id={VideoUploader.app_id}"
+                f"&display=page"
+                f"&redirect_uri=http://localhost:5000/auth/vk/callback"
+                f"&scope=video,offline,wall"
+                f"&response_type=token"
+                f"&v=5.131")
         
-        print("🔗 Откройте эту ссылку в браузере:")
-        print(auth_url)
-        print("\n📝 Инструкция:")
-        print("1. Авторизуйтесь в VK")
-        print("2. Разрешите доступ приложению") 
-        print("3. Скопируйте token из адресной строки")
-        print("   Пример: vk1.a.uxiTrV9m8bJkPwQ2...")
-        print()
-        
-        token = input("Введите токен: ").strip()
-        
-        # Очищаем токен если пользователь вставил URL
-        if "access_token=" in token:
-            token = token.split("access_token=")[1].split("&")[0]
-        
-        # Проверяем токен
-        try:
-            url = f"https://api.vk.com/method/users.get?access_token={token}&v=5.199"
-            response = requests.get(url)
-            data = response.json()
-            
-            if 'response' in data:
-                user = data['response'][0]
-                print(f"✅ Авторизован как: {user['first_name']} {user['last_name']}")
-                return token
-            else:
-                print(f"Ошибка проверки токена: {data}")
-                return None
-                
-        except Exception as e:
-            print(f"Ошибка проверки токена: {e}")
-            return None
+        webbrowser.open(auth_url)
+        for i in range(30):
+            if VideoUploader.token_storage.get('received'):
+                return VideoUploader.token_storage['token']
+            time.sleep(1)
+    
+        return None
 
     def upload_video(self, video_path, title, description="", group_id=None, album_id=None):
         try:

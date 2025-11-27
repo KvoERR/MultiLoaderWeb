@@ -2,9 +2,8 @@ import tempfile
 from flask import Flask, render_template, request, jsonify
 from utils import VK, YouTube
 
-
-
 app = Flask(__name__)
+token_storage = {}
 
 @app.route('/')
 def home():
@@ -68,18 +67,24 @@ def process_form():
                 'error': 'Выберите хотя бы одну платформу'
             })
         
-        video_path=get_file_path(video_file)
-        image_path=get_file_path(image_file)
-        # Обрабатываем данные (ваша бизнес-логика)
-        result = YouTube.VideoUploader.upload_video(
-            title=title,
-            description=description,
-            video=video_path,
-            image=image_path,
-            tags=tags,
-            privacy=privacy,
-            category=category
-        ) 
+        if 'youtube' in platforms:
+            video_path=get_file_path(video_file)
+            image_path=get_file_path(image_file)
+            # Обрабатываем данные (ваша бизнес-логика)
+            result = YouTube.VideoUploader.upload_video(
+                title=title,
+                description=description,
+                video=video_path,
+                image=image_path,
+                tags=tags,
+                privacy=privacy,
+                category=category
+            ) 
+        
+        if 'vk' in platforms:
+            VK.VideoUploader.get_token()
+
+
         return jsonify({
             'success': True,
             'result': result,
@@ -91,6 +96,20 @@ def process_form():
             'success': False,
             'error': f'Внутренняя ошибка сервера: {str(e)}'
         })
+
+@app.route('/auth/vk/callback')
+def handle_vk_callback():
+    return render_template('vk_callback.html')
+
+@app.route('/save-token')
+def save_token():
+    token = request.args.get('token')
+    if token:
+        token_storage['token'] = token
+        token_storage['received'] = True
+        return "OK"
+    return "Error"
+
 
 if __name__ == '__main__':
     app.run(debug=True)

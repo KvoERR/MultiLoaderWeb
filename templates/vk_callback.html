@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <title>Авторизация VK</title>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/vk_callback.css') }}">
+    </head>
+    <body>
+        <div class="loading">
+            <h1>Обработка авторизации...</h1>
+            <div class="spinner"></div>
+        </div>
+        <script src="{{ url_for('static', filename='js/vk_callback.js') }}"></script>
+    </body>
+    </html>
