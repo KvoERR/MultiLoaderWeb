@@ -1,4 +1,6 @@
-function submitForm() {
+import { VKAuth } from './vk-auth.js';
+
+window.submitForm = async function() {
     console.log('Кнопка нажата! Отправляем данные...');
     
     // Находим элементы
@@ -18,12 +20,18 @@ function submitForm() {
     // Собираем данные формы
     const formData = new FormData(form);
     
-    console.log('FormData содержимое:');
+    /*console.log('FormData содержимое:');
     for (let [key, value] of formData.entries()) {
         console.log(key + ': ', value);
+    }*/
+
+
+    if (document.querySelector('input[value="vk"]:checked')) {
+        console.log('VK auth started');
+        const vkAuth = new VKAuth();
+        await vkAuth.startAuth();
     }
 
-    
     // Отправляем AJAX запрос во Flask
     fetch('/process', {
         method: 'POST',
@@ -105,13 +113,5 @@ function validateForm() {
     
     return true;
 }
-
-// Обновляем основную функцию с валидацией
-const originalSubmitForm = submitForm;
-submitForm = function() {
-    if (validateForm()) {
-        originalSubmitForm.call(this);
-    }
-};
 
 console.log('Form handler loaded successfully!');

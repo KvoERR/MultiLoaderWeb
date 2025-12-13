@@ -27,9 +27,9 @@ def get_category_id(category):
         return category_to_id.get(category, '22')
 class VideoUploader:
     SCOPES = ['https://www.googleapis.com/auth/youtube.upload']
-    CLIENT_SECRETS_FILE = 'secrets/client_secret.json'
+    CLIENT_SECRETS_FILE = 'secrets/client_secret.json' # TODO небезопасно!!! переделать
 
-    @staticmethod
+    # TODO переделать на аутентификацию OAuth или что то вроде
     def get_authenticated_service():
         creds = None
         token_path = 'secrets/token.json'
@@ -71,7 +71,6 @@ class VideoUploader:
         
         return build('youtube', 'v3', credentials=creds)
     
-    @staticmethod
     def upload_video(title, description, category, video, image,
                     tags, privacy="private"):
         # Создаем сервис YouTube

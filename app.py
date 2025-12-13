@@ -1,20 +1,17 @@
 import tempfile
-from flask import Flask, render_template, request, jsonify
+import hashlib
+import base64
+import flask
+import secrets
+import requests
+from flask import Flask, render_template, request, jsonify, session
+from flask_cors import CORS
 from utils import VK, YouTube
 
 app = Flask(__name__)
-token_storage = {}
-
-@app.route('/')
-def home():
-    return render_template('base.html')
-
-
-'''@app.route('/autotag', methods=['GET'])
-def   tags_generation():
-    try:
-        print("Получен запрос на /autotag")
-'''
+CORS(app)
+app.secret_key = secrets.token_hex(32)
+app_id = "54311529"
 
 def get_file_path(file_storage):
     mime_to_text = {
@@ -34,6 +31,18 @@ def get_file_path(file_storage):
         file_storage.save(temp_file.name)
         return temp_file.name  # Возвращаем путь к файлу
 
+def generate_code_challenge(verifier):
+    # SHA-256 хеширование
+    sha256_hash = hashlib.sha256(verifier.encode('utf-8')).digest()
+    # Base64url кодирование
+    challenge = base64.urlsafe_b64encode(sha256_hash).rstrip(b'=')
+    return challenge.decode('utf-8')
+
+@app.route('/')
+def home():
+    return render_template('base.html')
+
+
 @app.route('/process', methods=['POST'])
 def process_form():
     try:
@@ -46,11 +55,6 @@ def process_form():
         privacy = request.form.get('privacy', '')
         platforms = request.form.getlist('platforms')
 
-        ''' Тест POST запроса
-        print(f"Данные от клиента: title={title}, category={category}, video={video_file}, image={image_file}, tags={tags}, privacy={privacy}, platforms={platforms}")
-        '''
-        
-        
         if not title:
             return jsonify({
                 'success': False,
@@ -67,11 +71,13 @@ def process_form():
                 'error': 'Выберите хотя бы одну платформу'
             })
         
+        video_path=get_file_path(video_file)
+        image_path=get_file_path(image_file)
+
+        yt_result = 'None'
+        vk_result = 'None'
         if 'youtube' in platforms:
-            video_path=get_file_path(video_file)
-            image_path=get_file_path(image_file)
-            # Обрабатываем данные (ваша бизнес-логика)
-            result = YouTube.VideoUploader.upload_video(
+            yt_result = YouTube.VideoUploader.upload_video(
                 title=title,
                 description=description,
                 video=video_path,
@@ -82,12 +88,17 @@ def process_form():
             ) 
         
         if 'vk' in platforms:
-            VK.VideoUploader.get_token()
-
-
+            vk_uploader = VK.VideoUploader(flask.session['vk_token'])
+            vk_result = vk_uploader.upload_video(
+                video_path=video_path,
+                title=title,
+                description=description
+            )
+            
         return jsonify({
             'success': True,
-            'result': result,
+            'yt_result': yt_result,
+            'vk_result': vk_result,
             'message': 'Данные успешно получены и обработаны'
         }) 
     except Exception as e:
@@ -97,19 +108,46 @@ def process_form():
             'error': f'Внутренняя ошибка сервера: {str(e)}'
         })
 
-@app.route('/auth/vk/callback')
-def handle_vk_callback():
-    return render_template('vk_callback.html')
+@app.route('/auth/vk/callback', methods=['POST'])
+def vk_callback():
+    try:
+        data = request.get_json()
 
-@app.route('/save-token')
-def save_token():
-    token = request.args.get('token')
-    if token:
-        token_storage['token'] = token
-        token_storage['received'] = True
-        return "OK"
-    return "Error"
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
 
+        code = data.get('code')
+        state = data.get('state')
+        code_verifier = data.get('code_verifier')
+        device_id = data.get('device_id')
+
+        if not code or not state or not code_verifier or not device_id:
+            return jsonify({'error': 'Missing required parameters'}), 400
+        
+        request_result=requests.post(
+            url='https://id.vk.ru/oauth2/auth',
+            data = {
+                'grant_type': 'authorization_code',
+                'code_verifier': code_verifier,
+                'redirect_uri': 'http://localhost:80/auth/vk/callback', 
+                'code': code,
+                'client_id': app_id,
+                'device_id': device_id,
+                'state': state
+            },
+            headers = {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            } 
+        )
+        flask.session['vk_token'] = request_result.json()['access_token']
+        return jsonify({
+            'success': True, 
+            'message': 'Authorized'
+            })
+
+    except Exception as e:
+        print(f"Ошибка в /auth/vk/callback: {e}")
+        return jsonify({'error': 'Internal server error'}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=80, host='localhost')
