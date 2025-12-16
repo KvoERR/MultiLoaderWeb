@@ -6,7 +6,7 @@ import secrets
 import requests
 from flask import Flask, render_template, request, jsonify, session
 from flask_cors import CORS
-from utils import VK, YouTube
+from utils import VK, YouTube, Telegram
 
 app = Flask(__name__)
 CORS(app)
@@ -94,7 +94,14 @@ def process_form():
                 title=title,
                 description=description
             )
-            
+
+        if 'telegram' in platforms:
+            telegram_result = Telegram.upload_video(
+                video_path=video_path,
+                name=title,
+                description=description
+            )       
+
         return jsonify({
             'success': True,
             'yt_result': yt_result,

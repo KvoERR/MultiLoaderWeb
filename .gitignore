@@ -5,3 +5,7 @@ token.json
 *.mp4
 *.jpg
 *.avi
+.env
+*.env
+__pycache__
+*.pyc
