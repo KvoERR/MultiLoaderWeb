@@ -67,3 +67,13 @@ header {
         flex-direction: column;
     }
 }
+
+.sub-option {
+    margin-left: 20px;
+    color: #666;
+    font-size: 0.9em;
+}
+
+.sub-option:has(input:disabled) {
+    opacity: 0.6;
+}

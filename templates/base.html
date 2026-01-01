@@ -91,26 +91,41 @@
                 <div class="platforms">
                     <p>Плтаформы</p>
                     <label>
+                        <input type="checkbox" name="platforms" value="telegram"> 
+                        Telegram
+                        <button type="button" class="platform-btn" onclick="toggleInfo('telegram')">?
+                            <!--Сделать иконку
+                            <img src="/static/icons/telegram-icon.svg" width="14" height="14" alt="Telegram"> 
+                            -->
+                        </button>
+                    </label>
+
+                    <div class="sub-option">
+                        <label>
+                            <input type="checkbox" id="zenCheckbox" name="platforms" value="yandex"> Яндекс Дзен
+                        </label>
+                    </div>
+
+                    <label>
                         <input type="checkbox" name="platforms" value="youtube"> YouTube
                     </label>
-                    
+
+                    <div class="sub-option">
+                        <label>
+                            <input type="checkbox" id="rutubeCheckbox" name="platforms" value="rutube"> RuTube
+                        </label>
+                    </div>
+
                     <label>
                         <input type="checkbox" name="platforms" value="vk"> VK Видео
                     </label>
-                    
-                    <label>
-                        <input type="checkbox" name="platforms" value="telegram"> Telegram
-                    </label>
 
-                    <label>
-                        <input type="checkbox" name="platforms" value="yandex"> Яндекс Дзен
-                    </label>
-
-                    <label>
-                        <input type="checkbox" name="platforms" value="rutube"> RuTube
-                    </label>
 
                     <button type="button" onclick="submitForm()">Обработать данные</button>
+                </div>
+
+                <div id="info-telegram" class="info-box" style="display: none;">
+                    
                 </div>
             </div>
         </form>
@@ -123,4 +138,5 @@
     <script src="https://unpkg.com/@vkid/sdk@<3.0.0/dist-sdk/umd/index.js"></script>
     <script type="module" src="{{ url_for('static', filename='js/form-handler.js') }}"></script>
     <script src="{{ url_for('static', filename='js/file-explorer.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/platforms.js') }}"></script>
 </html>
