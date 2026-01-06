@@ -4,13 +4,19 @@ import base64
 import flask
 import secrets
 import requests
-from flask import Flask, render_template, request, jsonify, session
+from flask import Flask, render_template, request, jsonify, g
+import pymysql
+import jwt
+import datetime
+import bcrypt
+import os
 from flask_cors import CORS
 from utils import VK, YouTube, Telegram
 
 app = Flask(__name__)
 CORS(app)
 app.secret_key = secrets.token_hex(32)
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app_id = "54311529"
 
 def get_file_path(file_storage):
@@ -38,9 +44,118 @@ def generate_code_challenge(verifier):
     challenge = base64.urlsafe_b64encode(sha256_hash).rstrip(b'=')
     return challenge.decode('utf-8')
 
+
+# Подключение к MySQL
+def get_db():
+    return pymysql.connect(
+        host='localhost',
+        port=3306,
+        user='admin',
+        password='password',
+        database='multiloader',
+        cursorclass=pymysql.cursors.DictCursor  # Чтобы получать dict
+    )
+
+# Создание таблицы users
+def init_db():
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            username VARCHAR(50) UNIQUE NOT NULL,
+            password_hash TEXT NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    conn.commit()
+    cur.close()
+    conn.close()
+
+# Хеширование пароля
+def hash_password(password):
+    return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+
+# Проверка пароля
+def verify_password(password, hash):
+    return bcrypt.checkpw(password.encode('utf-8'), hash.encode('utf-8'))
+
 @app.route('/')
 def home():
     return render_template('base.html')
+
+# Регистрация
+@app.route('/register', methods=['POST'])
+def register():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+
+    if not username or not password:
+        return jsonify({'error': 'Логин и пароль обязательны'}), 400
+
+    conn = get_db()
+    cur = conn.cursor()
+
+    try:
+        password_hash = hash_password(password)
+        cur.execute(
+            "INSERT INTO users (username, password_hash) VALUES (%s, %s)",
+            (username, password_hash)
+        )
+        conn.commit()
+        return jsonify({'message': 'Пользователь успешно зарегистрирован'}), 201
+    except pymysql.IntegrityError:
+        return jsonify({'error': 'Пользователь с таким именем уже существует'}), 400
+    finally:
+        cur.close()
+        conn.close()
+
+# Логин и выдача JWT
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    username = data.get('username')
+    password = data.get('password')
+
+    conn = get_db()
+    cur = conn.cursor()
+    cur.execute("SELECT id, username, password_hash FROM users WHERE username = %s", (username,))
+    user = cur.fetchone()
+    cur.close()
+    conn.close()
+
+    if user and verify_password(password, user['password_hash']):
+        token = jwt.encode({
+            'user_id': user['id'],
+            'username': user['username'],
+            'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+        }, app.config['SECRET_KEY'], algorithm='HS256')
+
+        return jsonify({'token': token})
+    else:
+        return jsonify({'error': 'Неверный логин или пароль'}), 401
+
+# Защищённый маршрут
+@app.route('/upload', methods=['POST'])
+def upload():
+    token = request.headers.get('Authorization')
+
+    if not token:
+        return jsonify({'error': 'Требуется токен авторизации'}), 401
+
+    try:
+        if token.startswith('Bearer '):
+            token = token[7:]
+        data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+        return jsonify({
+            'message': f'Видео успешно загружено от имени {data["username"]}',
+            'user_id': data['user_id']
+        })
+    except jwt.ExpiredSignatureError:
+        return jsonify({'error': 'Срок действия токена истёк'}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({'error': 'Неверный токен'}), 401
 
 
 @app.route('/process', methods=['POST'])

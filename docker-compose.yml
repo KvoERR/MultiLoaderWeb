@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:8.0                  # Какую версию MySQL использовать
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass   # TODO поменять
+      MYSQL_DATABASE: multiloader     # Создаёт БД с именем multiloader
+      MYSQL_USER: admin               # Создаёт пользователя admin
+      MYSQL_PASSWORD: password        # TODO поменять
+    ports:
+      - "3306:3306"                   # Открывает порт: снаружи → внутрь
+    volumes:
+      - mysql_data:/var/lib/mysql     # Сохраняет данные между перезапусками
+    command: --default-authentication-plugin=mysql_native_password

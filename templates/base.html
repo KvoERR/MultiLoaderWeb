@@ -14,7 +14,7 @@
         <h1>MultiLoader</h1>
     </header>
 
-    <main>
+    <main class="main-container">
         <form class="upload-form" id="uploadForm">
             <div class="form-container">
                 <div class="video-info">
@@ -124,13 +124,15 @@
                     <button type="button" onclick="submitForm()">Обработать данные</button>
                 </div>
 
-                <div id="info-telegram" class="info-box" style="display: none;">
-                    
+                <div id="info-telegram" class="info-box" style="display: none;"> 
                 </div>
             </div>
         </form>
         <div id="result" class="result"></div>
-    </div>
+
+        <button class="account-btn" onclick="toggleMainInfo()">
+            ℹ️
+        </button>
     </main>
 
     <footer>
