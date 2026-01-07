@@ -130,9 +130,37 @@
         </form>
         <div id="result" class="result"></div>
 
-        <button class="account-btn" onclick="toggleMainInfo()">
+        <button id="auth-btn" onclick="openAuthPopup()">
             ℹ️
         </button>
+
+        <div id="auth-popup" class="popup">
+            <div class="popup-content">
+                <span class="close-btn" onclick="closeAuthPopup()">&times;</span>
+
+                <!-- Вкладки: Вход / Регистрация -->
+                <div class="auth-tabs">
+                    <button id="loginTabBtn" class="tab-btn active" onclick="switchAuthTab('login')">Вход</button>
+                    <button id="registerTabBtn" class="tab-btn" onclick="switchAuthTab('register')">Регистрация</button>
+                </div>
+
+                <!-- Форма Входа -->
+                <form id="loginForm" class="auth-form" onsubmit="login(event)">
+                    <input type="text" placeholder="Логин" name="username" required />
+                    <input type="password" placeholder="Пароль" name="password" required />
+                    <button type="submit">Войти</button>
+                </form>
+
+                <!-- Форма Регистрации -->
+                <form id="registerForm" class="auth-form" style="display: none;" onsubmit="register(event)">
+                    <input type="text" placeholder="Логин" name="username" required />
+                    <input type="password" placeholder="Пароль" name="password" required />
+                    <input type="password" placeholder="Подтвердите пароль" name="confirmPassword" required />
+                    <button type="submit">Зарегистрироваться</button>
+                </form>
+            </div>
+        </div>
+
     </main>
 
     <footer>
@@ -141,4 +169,5 @@
     <script type="module" src="{{ url_for('static', filename='js/form-handler.js') }}"></script>
     <script src="{{ url_for('static', filename='js/file-explorer.js') }}"></script>
     <script src="{{ url_for('static', filename='js/platforms.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/user-auth.js') }}"></script>
 </html>

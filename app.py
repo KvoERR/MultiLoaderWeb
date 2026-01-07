@@ -5,19 +5,47 @@ import flask
 import secrets
 import requests
 from flask import Flask, render_template, request, jsonify, g
-import pymysql
 import jwt
 import datetime
 import bcrypt
 import os
 from flask_cors import CORS
 from utils import VK, YouTube, Telegram
+from sqlalchemy import create_engine, Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, relationship
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
 app.secret_key = secrets.token_hex(32)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app_id = "54311529"
+
+# Настройка SQLAlchemy
+DATABASE_URI = os.getenv('DATABASE_URI')
+engine = create_engine(DATABASE_URI, echo=False)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
+
+# === Модель User ===
+class User(Base):
+    __tablename__ = 'users'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    username = Column(String(50), unique=True, nullable=False)
+    password_hash = Column(String(128), nullable=False)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+# === Инициализация БД ===
+def init_db():
+    Base.metadata.create_all(bind=engine)  # Создаст таблицы, если их нет
+
+# === Хелпер: получение сессии БД ===
+def get_db_session():
+    return SessionLocal()
 
 def get_file_path(file_storage):
     mime_to_text = {
@@ -44,34 +72,6 @@ def generate_code_challenge(verifier):
     challenge = base64.urlsafe_b64encode(sha256_hash).rstrip(b'=')
     return challenge.decode('utf-8')
 
-
-# Подключение к MySQL
-def get_db():
-    return pymysql.connect(
-        host='localhost',
-        port=3306,
-        user='admin',
-        password='password',
-        database='multiloader',
-        cursorclass=pymysql.cursors.DictCursor  # Чтобы получать dict
-    )
-
-# Создание таблицы users
-def init_db():
-    conn = get_db()
-    cur = conn.cursor()
-    cur.execute('''
-        CREATE TABLE IF NOT EXISTS users (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            username VARCHAR(50) UNIQUE NOT NULL,
-            password_hash TEXT NOT NULL,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        )
-    ''')
-    conn.commit()
-    cur.close()
-    conn.close()
-
 # Хеширование пароля
 def hash_password(password):
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
@@ -84,7 +84,7 @@ def verify_password(password, hash):
 def home():
     return render_template('base.html')
 
-# Регистрация
+# === Регистрация ===
 @app.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
@@ -94,53 +94,53 @@ def register():
     if not username or not password:
         return jsonify({'error': 'Логин и пароль обязательны'}), 400
 
-    conn = get_db()
-    cur = conn.cursor()
-
+    db = get_db_session()
     try:
-        password_hash = hash_password(password)
-        cur.execute(
-            "INSERT INTO users (username, password_hash) VALUES (%s, %s)",
-            (username, password_hash)
-        )
-        conn.commit()
-        return jsonify({'message': 'Пользователь успешно зарегистрирован'}), 201
-    except pymysql.IntegrityError:
-        return jsonify({'error': 'Пользователь с таким именем уже существует'}), 400
-    finally:
-        cur.close()
-        conn.close()
+        if db.query(User).filter(User.username == username).first():
+            return jsonify({'error': 'Пользователь уже существует'}), 400
 
-# Логин и выдача JWT
+        password_hash = hash_password(password)
+        user = User(username=username, password_hash=password_hash)
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+
+        return jsonify({'message': 'Пользователь успешно зарегистрирован'}), 201
+    except Exception as e:
+        db.rollback()
+        return jsonify({'error': 'Ошибка сервера'}), 500
+    finally:
+        db.close()
+
+# === Логин ===
 @app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
 
-    conn = get_db()
-    cur = conn.cursor()
-    cur.execute("SELECT id, username, password_hash FROM users WHERE username = %s", (username,))
-    user = cur.fetchone()
-    cur.close()
-    conn.close()
+    db = get_db_session()
+    try:
+        user = db.query(User).filter(User.username == username).first()
+        if user and verify_password(password, user.password_hash):
+            token = jwt.encode({
+                'user_id': user.id,
+                'username': user.username,
+                'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+            }, app.config['SECRET_KEY'], algorithm='HS256')
 
-    if user and verify_password(password, user['password_hash']):
-        token = jwt.encode({
-            'user_id': user['id'],
-            'username': user['username'],
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
-        }, app.config['SECRET_KEY'], algorithm='HS256')
+            return jsonify({'token': token})
+        else:
+            return jsonify({'error': 'Неверный логин или пароль'}), 401
+    except Exception as e:
+        return jsonify({'error': 'Ошибка сервера'}), 500
+    finally:
+        db.close()
 
-        return jsonify({'token': token})
-    else:
-        return jsonify({'error': 'Неверный логин или пароль'}), 401
-
-# Защищённый маршрут
+# === Защищённый маршрут ===
 @app.route('/upload', methods=['POST'])
 def upload():
     token = request.headers.get('Authorization')
-
     if not token:
         return jsonify({'error': 'Требуется токен авторизации'}), 401
 
@@ -272,4 +272,5 @@ def vk_callback():
         return jsonify({'error': 'Internal server error'}), 500
 
 if __name__ == '__main__':
+    init_db()
     app.run(debug=True, port=80, host='localhost')
