@@ -12,8 +12,7 @@ import os
 from flask_cors import CORS
 from utils import VK, YouTube, Telegram
 from sqlalchemy import create_engine, Column, Integer, String, DateTime, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship
+from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -22,30 +21,25 @@ app = Flask(__name__)
 CORS(app)
 app.secret_key = secrets.token_hex(32)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-app_id = "54311529"
+app_id = "54311529" #TODO вроде небезопасно
 
-# Настройка SQLAlchemy
 DATABASE_URI = os.getenv('DATABASE_URI')
 engine = create_engine(DATABASE_URI, echo=False)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
-# === Модель User ===
 class User(Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     username = Column(String(50), unique=True, nullable=False)
     password_hash = Column(String(128), nullable=False)
+    tg_chat_id = Column(Integer)
+    tg_chat_name = Column(String(50))
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
-# === Инициализация БД ===
 def init_db():
-    Base.metadata.create_all(bind=engine)  # Создаст таблицы, если их нет
-
-# === Хелпер: получение сессии БД ===
-def get_db_session():
-    return SessionLocal()
+    Base.metadata.create_all(bind=engine)
 
 def get_file_path(file_storage):
     mime_to_text = {
@@ -84,7 +78,6 @@ def verify_password(password, hash):
 def home():
     return render_template('base.html')
 
-# === Регистрация ===
 @app.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
@@ -94,7 +87,7 @@ def register():
     if not username or not password:
         return jsonify({'error': 'Логин и пароль обязательны'}), 400
 
-    db = get_db_session()
+    db = SessionLocal()
     try:
         if db.query(User).filter(User.username == username).first():
             return jsonify({'error': 'Пользователь уже существует'}), 400
@@ -112,14 +105,13 @@ def register():
     finally:
         db.close()
 
-# === Логин ===
 @app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
     username = data.get('username')
     password = data.get('password')
 
-    db = get_db_session()
+    db = SessionLocal()
     try:
         user = db.query(User).filter(User.username == username).first()
         if user and verify_password(password, user.password_hash):
@@ -137,7 +129,6 @@ def login():
     finally:
         db.close()
 
-# === Защищённый маршрут ===
 @app.route('/upload', methods=['POST'])
 def upload():
     token = request.headers.get('Authorization')

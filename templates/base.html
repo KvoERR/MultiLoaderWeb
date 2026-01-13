@@ -120,16 +120,21 @@
                         <input type="checkbox" name="platforms" value="vk"> VK Видео
                     </label>
 
-
                     <button type="button" onclick="submitForm()">Обработать данные</button>
                 </div>
 
                 <div id="info-telegram" class="info-box" style="display: none;"> 
+                    <p>
+                        1. Добавьте в качестве администратора в свой канал бота <a href="https://t.me/multi_loaderbot">@multi_loaderbot</a><br>
+                        2. Напишите в свой канал полное название вашего канала<br>
+                        3. Впишите название вашего канала в поле: <input type="text" id="thName" name="tags" placeholder="Название" required>
+                    </p>
+                    <button type="button" onclick="tgConnect()">Привязать канал</button>
                 </div>
+                
             </div>
         </form>
         <div id="result" class="result"></div>
-
         <button id="auth-btn" onclick="openAuthPopup()">
             ℹ️
         </button>
@@ -160,7 +165,6 @@
                 </form>
             </div>
         </div>
-
     </main>
 
     <footer>

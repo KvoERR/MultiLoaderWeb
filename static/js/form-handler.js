@@ -113,5 +113,3 @@ function validateForm() {
     
     return true;
 }
-
-console.log('Form handler loaded successfully!');

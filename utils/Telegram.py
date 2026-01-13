@@ -15,6 +15,7 @@ def get_file_size(filepath):
         raise Exception(f"Файл не найден или недоступен: {e}")
 
 #TODO убрать чат id
+#https://api.telegram.org/bot{}/getUpdates
 def upload_video(video_path, name, description, chat_id='-1001988753818'):
     if not os.path.exists(video_path):
         print(f"Ошибка: файл не найден — {video_path}")

@@ -40,20 +40,22 @@ function login(e) {
         },
         body: JSON.stringify({ username, password })
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.token) {
-            localStorage.setItem('token', data.token);
-            alert('Успешный вход!');
-            closeAuthPopup();
-            // Можно добавить перезагрузку или переход: window.location.reload();
-        } else {
-            alert('Ошибка: ' + data.error);
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(errData => {
+                throw new Error(errData.error || 'Ошибка входа');
+            });
         }
+        return response.json();
+    })
+    .then(data => {
+        localStorage.setItem('token', data.token);
+        alert('Успешный вход!');
+        closeAuthPopup();
     })
     .catch(err => {
         console.error('Ошибка входа:', err);
-        alert('Ошибка соединения с сервером');
+        alert('Ошибка: ' + err.message);
     });
 }
 
@@ -77,18 +79,23 @@ function register(e) {
         },
         body: JSON.stringify({ username, password })
     })
-    .then(response => response.json())
-    .then(data => {
-        if (response.ok) {
-            alert('Регистрация успешна! Войдите в аккаунт.');
-            switchAuthTab('login');
-        } else {
-            alert('Ошибка: ' + data.error);
+    .then(response => {
+        if (!response.ok) {
+            // Если ошибка (например, 400, 500)
+            return response.json().then(errData => {
+                throw new Error(errData.error || 'Неизвестная ошибка');
+            });
         }
+        // Если всё ок — возвращаем JSON
+        return response.json();
+    })
+    .then(data => {
+        alert('Регистрация успешна! Войдите в аккаунт.');
+        switchAuthTab('login');
     })
     .catch(err => {
         console.error('Ошибка регистрации:', err);
-        alert('Ошибка соединения с сервером');
+        alert('Ошибка: ' + err.message);
     });
 }
 
