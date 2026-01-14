@@ -22,6 +22,7 @@ CORS(app)
 app.secret_key = secrets.token_hex(32)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app_id = "54311529" #TODO вроде небезопасно
+bot_token=os.getenv('BOT_TOKEN')
 
 DATABASE_URI = os.getenv('DATABASE_URI')
 engine = create_engine(DATABASE_URI, echo=False)
@@ -220,6 +221,62 @@ def process_form():
             'success': False,
             'error': f'Внутренняя ошибка сервера: {str(e)}'
         })
+    
+@app.route('/auth/tg', methods=['POST'])  # ← Убери слеш в конце
+def tg_auth():
+    data = request.get_json()
+
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
+
+    channel_name = data.get('channel_name', '').strip()
+
+    if not channel_name:
+        return jsonify({'error': 'Channel name is required'}), 400
+    
+    response = requests.get(f'https://api.telegram.org/bot{bot_token}/getUpdates')
+    print(response)
+    return jsonify({
+            'success': True, 
+            'message': 'Authorized'
+            }), 200
+            
+'''
+    # Получаем текущего пользователя (по токену из заголовка)
+    token = request.headers.get('Authorization')
+    if not token:
+        return jsonify({'error': 'Authentication required'}), 401
+
+    try:
+        if token.startswith('Bearer '):
+            token = token[7:]
+        payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+        user_id = payload['user_id']
+    except jwt.InvalidTokenError:
+        return jsonify({'error': 'Invalid or expired token'}), 401
+
+    # Сохраняем название канала в БД
+    db = SessionLocal()
+    try:
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+
+        user.tg_chat_name = channel_name
+        # Пока tg_chat_id неизвестен — можно заполнить позже
+        db.commit()
+
+        return jsonify({
+            'success': True,
+            'message': f'Канал "{channel_name}" привязан к вашему аккаунту'
+        }), 200
+    except Exception as e:
+        db.rollback()
+        print("❌ Ошибка при привязке канала:", e)
+        return jsonify({'error': 'Database error'}), 500
+    finally:
+        db.close()
+        '''
 
 @app.route('/auth/vk/callback', methods=['POST'])
 def vk_callback():

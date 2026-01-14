@@ -127,9 +127,9 @@
                     <p>
                         1. Добавьте в качестве администратора в свой канал бота <a href="https://t.me/multi_loaderbot">@multi_loaderbot</a><br>
                         2. Напишите в свой канал полное название вашего канала<br>
-                        3. Впишите название вашего канала в поле: <input type="text" id="thName" name="tags" placeholder="Название" required>
+                        3. Впишите название вашего канала в поле: <input type="text" id="channel-name" placeholder="Название" required>
                     </p>
-                    <button type="button" onclick="tgConnect()">Привязать канал</button>
+                    <button type="button" id="tg-connect-btn" onclick="tgAuth()">Привязать канал</button>
                 </div>
                 
             </div>
@@ -174,4 +174,6 @@
     <script src="{{ url_for('static', filename='js/file-explorer.js') }}"></script>
     <script src="{{ url_for('static', filename='js/platforms.js') }}"></script>
     <script src="{{ url_for('static', filename='js/user-auth.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tg-auth.js') }}"></script>
+    
 </html>
