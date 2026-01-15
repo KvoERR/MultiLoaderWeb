@@ -22,7 +22,7 @@ CORS(app)
 app.secret_key = secrets.token_hex(32)
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app_id = "54311529" #TODO вроде небезопасно
-bot_token=os.getenv('BOT_TOKEN')
+bot_token=os.getenv('TG_BOT_TOKEN')
 
 DATABASE_URI = os.getenv('DATABASE_URI')
 engine = create_engine(DATABASE_URI, echo=False)
@@ -234,8 +234,19 @@ def tg_auth():
     if not channel_name:
         return jsonify({'error': 'Channel name is required'}), 400
     
-    response = requests.get(f'https://api.telegram.org/bot{bot_token}/getUpdates')
-    print(response)
+    request_result = requests.get(
+        f'https://api.telegram.org/bot{bot_token}/getUpdates'
+        ).json()
+
+    for update in request_result.get('result', []):
+        channel_post = update['channel_post']
+        if 'text' in channel_post and channel_post.get('text', '')==channel_name:
+            chat_id = channel_post['chat']['id']
+            message_text = channel_post.get('text', '')
+
+            print(f"ID чата: {chat_id}")
+
+
     return jsonify({
             'success': True, 
             'message': 'Authorized'
