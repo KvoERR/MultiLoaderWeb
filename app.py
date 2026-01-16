@@ -242,17 +242,7 @@ def tg_auth():
         channel_post = update['channel_post']
         if 'text' in channel_post and channel_post.get('text', '')==channel_name:
             chat_id = channel_post['chat']['id']
-            message_text = channel_post.get('text', '')
 
-            print(f"ID чата: {chat_id}")
-
-
-    return jsonify({
-            'success': True, 
-            'message': 'Authorized'
-            }), 200
-            
-'''
     # Получаем текущего пользователя (по токену из заголовка)
     token = request.headers.get('Authorization')
     if not token:
@@ -274,7 +264,7 @@ def tg_auth():
             return jsonify({'error': 'User not found'}), 404
 
         user.tg_chat_name = channel_name
-        # Пока tg_chat_id неизвестен — можно заполнить позже
+        user.tg_chat_id = chat_id
         db.commit()
 
         return jsonify({
@@ -287,7 +277,7 @@ def tg_auth():
         return jsonify({'error': 'Database error'}), 500
     finally:
         db.close()
-        '''
+
 
 @app.route('/auth/vk/callback', methods=['POST'])
 def vk_callback():

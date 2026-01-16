@@ -23,6 +23,7 @@ async function tgAuth() {
 
         if (response.ok) {
             document.getElementById('info-telegram').style.display = 'none';
+            //сюда добавить изменение кнопки после привязки
         } else {
             alert('Ошибка: ' + result.error);
         }

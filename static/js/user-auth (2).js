@@ -99,6 +99,10 @@ function register(e) {
     });
 }
 
+function auth()
+{
+    
+}
 // Закрытие попапа по клику на подложку
 authPopup.addEventListener('click', function(e) {
     if (e.target === authPopup) {
