@@ -93,7 +93,7 @@
                     <label>
                         <input type="checkbox" name="platforms" value="telegram"> 
                         Telegram
-                        <button type="button" class="platform-btn" onclick="toggleInfo('telegram')">?
+                        <button id="tg-info-btn" type="button" onclick="toggleInfo('telegram')">?
                             <!--Сделать иконку
                             <img src="/static/icons/telegram-icon.svg" width="14" height="14" alt="Telegram"> 
                             -->
@@ -174,6 +174,5 @@
     <script src="{{ url_for('static', filename='js/file-explorer.js') }}"></script>
     <script src="{{ url_for('static', filename='js/platforms.js') }}"></script>
     <script src="{{ url_for('static', filename='js/user-auth.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/tg-auth.js') }}"></script>
     
 </html>

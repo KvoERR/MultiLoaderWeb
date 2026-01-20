@@ -3,6 +3,10 @@ const loginForm = document.getElementById('loginForm');
 const registerForm = document.getElementById('registerForm');
 const loginTabBtn = document.getElementById('loginTabBtn');
 const registerTabBtn = document.getElementById('registerTabBtn');
+const authBtn = document.getElementById('auth-btn');
+const tgInfoBtn = document.getElementById('tg-info-btn');
+const tgAuthBtn = document.getElementById('tg-connect-btn');
+const channelName = document.getElementById('channel-name');
 
 // Открыть попап и переключиться на нужную вкладку
 function openAuthPopup(tab = 'login') {
@@ -27,42 +31,32 @@ function switchAuthTab(tab) {
 }
 
 // Обработка формы входа
-function login(e) {
+async function login(e) {
     e.preventDefault();
-    const formData = new FormData(loginForm);
+    const form = e.target;
+    const formData = new FormData(form);
     const username = formData.get('username');
     const password = formData.get('password');
 
-    fetch('/login', {
+    const response = await fetch('/login', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
-    })
-    .then(response => {
-        if (!response.ok) {
-            return response.json().then(errData => {
-                throw new Error(errData.error || 'Ошибка входа');
-            });
-        }
-        return response.json();
-    })
-    .then(data => {
-        localStorage.setItem('token', data.token);
-        alert('Успешный вход!');
-        closeAuthPopup();
-    })
-    .catch(err => {
-        console.error('Ошибка входа:', err);
-        alert('Ошибка: ' + err.message);
     });
+
+    const data = await response.json();
+
+    if (response.ok) {
+        authUpdate(data);
+    } else {
+        alert('Ошибка: ' + data.error);
+    }
 }
 
-// Обработка формы регистрации
-function register(e) {
+async function register(e) {
     e.preventDefault();
-    const formData = new FormData(registerForm);
+    const form = e.target;
+    const formData = new FormData(form);
     const username = formData.get('username');
     const password = formData.get('password');
     const confirmPassword = formData.get('confirmPassword');
@@ -72,31 +66,83 @@ function register(e) {
         return;
     }
 
-    fetch('/register', {
+    const response = await fetch('/register', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
-    })
-    .then(response => {
-        if (!response.ok) {
-            // Если ошибка (например, 400, 500)
-            return response.json().then(errData => {
-                throw new Error(errData.error || 'Неизвестная ошибка');
-            });
-        }
-        // Если всё ок — возвращаем JSON
-        return response.json();
-    })
-    .then(data => {
-        alert('Регистрация успешна! Войдите в аккаунт.');
-        switchAuthTab('login');
-    })
-    .catch(err => {
-        console.error('Ошибка регистрации:', err);
-        alert('Ошибка: ' + err.message);
     });
+
+    const data = await response.json();
+
+    if (response.ok) {
+        authUpdate(data);
+    } else {
+        alert('Ошибка: ' + data.error);
+    }
+}
+
+async function authUpdate(data) {
+    authBtn.textContent = '👤';
+    authBtn.title = 'Выйти';
+    authBtn.onclick = function() {
+        localStorage.removeItem('token');
+
+        location.reload();
+    };
+    if (data.tg_auth) {
+        activateTgButton();
+    }
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('tg_auth', data.tg_auth);
+    console.log('tg_auth: ' + data.tg_auth);
+    closeAuthPopup();
+}
+
+async function tgAuth() {
+    if (!channelName.value.trim()) {
+        alert('Введите название канала');
+        return;
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+        alert('Вы не авторизованы');
+        openAuthPopup('login');
+        return;
+    }
+
+    tgAuthBtn.disabled = true;
+    tgAuthBtn.textContent = 'Привязываем...';
+
+    try {
+        const response = await fetch('/auth/tg', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+            body: JSON.stringify({ channel_name: channelName.value.trim() })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            activateTgButton();
+            localStorage.setItem('tg_auth', true);
+            document.getElementById('info-telegram').style.display = 'none';
+        } else {
+            alert('Ошибка: ' + result.error);
+        }
+    } catch (err) {
+        alert('Ошибка подключения: ' + err.message);
+    } finally {
+        tgAuthBtn.disabled = false;
+        tgAuthBtn.textContent = 'Привязать канал';
+    }
+}
+
+async function activateTgButton() {
+    tgInfoBtn.style.backgroundColor = 'green';
 }
 
 // Закрытие попапа по клику на подложку
@@ -110,6 +156,28 @@ authPopup.addEventListener('click', function(e) {
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape' && authPopup.style.display === 'flex') {
         closeAuthPopup();
+    }
+});
+
+// Проверка токена при загрузке страницы
+window.addEventListener('load', function() {
+    const token = localStorage.getItem('token');
+
+    if (!authBtn) return;
+
+    if (token) {
+        authBtn.textContent = '👤';
+        authBtn.title = 'Выйти';
+        authBtn.onclick = function() {
+            localStorage.removeItem('token');
+            location.reload();
+        };
+    } else {
+        authBtn.textContent = 'ℹ️';
+        authBtn.title = 'Войти';
+        authBtn.onclick = function() {
+            openAuthPopup('login');
+        };
     }
 });
 

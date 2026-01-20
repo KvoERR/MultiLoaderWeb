@@ -99,7 +99,17 @@ def register():
         db.commit()
         db.refresh(user)
 
-        return jsonify({'message': 'Пользователь успешно зарегистрирован'}), 201
+        token = jwt.encode({
+            'user_id': user.id,
+            'username': user.username,
+            'exp': datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=24)
+        }, app.config['SECRET_KEY'], algorithm='HS256')
+
+        return jsonify({
+                'token': token,
+                'tg_auth': user.tg_chat_name is not None
+        }), 201
+
     except Exception as e:
         db.rollback()
         return jsonify({'error': 'Ошибка сервера'}), 500
@@ -119,14 +129,72 @@ def login():
             token = jwt.encode({
                 'user_id': user.id,
                 'username': user.username,
-                'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+                'exp': datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=24)
             }, app.config['SECRET_KEY'], algorithm='HS256')
-
-            return jsonify({'token': token})
+            
+            return jsonify({
+                'token': token,
+                'tg_auth': user.tg_chat_name is not None
+            })
+            
         else:
             return jsonify({'error': 'Неверный логин или пароль'}), 401
     except Exception as e:
         return jsonify({'error': 'Ошибка сервера'}), 500
+    finally:
+        db.close()
+
+@app.route('/auth/tg', methods=['POST'])
+def tg_auth():
+    data = request.get_json()
+
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
+
+    channel_name = data.get('channel_name', '').strip()
+
+    if not channel_name:
+        return jsonify({'error': 'Channel name is required'}), 400
+    
+    request_result = requests.get(
+        f'https://api.telegram.org/bot{bot_token}/getUpdates'
+        ).json()
+
+    for update in request_result.get('result', []):
+        channel_post = update['channel_post']
+        if 'text' in channel_post and channel_post.get('text', '')==channel_name:
+            chat_id = channel_post['chat']['id']
+
+    # Получаем текущего пользователя (по токену из заголовка)
+    token = request.headers.get('Authorization')
+    if not token:
+        return jsonify({'error': 'Authentication required'}), 401
+
+    try:
+        if token.startswith('Bearer '):
+            token = token[7:]
+        payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+        user_id = payload['user_id']
+    except jwt.InvalidTokenError:
+        return jsonify({'error': 'Invalid or expired token'}), 401
+
+    # Сохраняем название канала в БД
+    db = SessionLocal()
+    try:
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+
+        user.tg_chat_name = channel_name
+        user.tg_chat_id = chat_id
+        db.commit()
+
+        return jsonify({
+            'success': True
+        }), 200
+    except Exception as e:
+        db.rollback()
+        return jsonify({'error': 'Database error'}), 500
     finally:
         db.close()
 
@@ -221,63 +289,6 @@ def process_form():
             'success': False,
             'error': f'Внутренняя ошибка сервера: {str(e)}'
         })
-    
-@app.route('/auth/tg', methods=['POST'])  # ← Убери слеш в конце
-def tg_auth():
-    data = request.get_json()
-
-    if not data:
-        return jsonify({'error': 'No data provided'}), 400
-
-    channel_name = data.get('channel_name', '').strip()
-
-    if not channel_name:
-        return jsonify({'error': 'Channel name is required'}), 400
-    
-    request_result = requests.get(
-        f'https://api.telegram.org/bot{bot_token}/getUpdates'
-        ).json()
-
-    for update in request_result.get('result', []):
-        channel_post = update['channel_post']
-        if 'text' in channel_post and channel_post.get('text', '')==channel_name:
-            chat_id = channel_post['chat']['id']
-
-    # Получаем текущего пользователя (по токену из заголовка)
-    token = request.headers.get('Authorization')
-    if not token:
-        return jsonify({'error': 'Authentication required'}), 401
-
-    try:
-        if token.startswith('Bearer '):
-            token = token[7:]
-        payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
-        user_id = payload['user_id']
-    except jwt.InvalidTokenError:
-        return jsonify({'error': 'Invalid or expired token'}), 401
-
-    # Сохраняем название канала в БД
-    db = SessionLocal()
-    try:
-        user = db.query(User).filter(User.id == user_id).first()
-        if not user:
-            return jsonify({'error': 'User not found'}), 404
-
-        user.tg_chat_name = channel_name
-        user.tg_chat_id = chat_id
-        db.commit()
-
-        return jsonify({
-            'success': True,
-            'message': f'Канал "{channel_name}" привязан к вашему аккаунту'
-        }), 200
-    except Exception as e:
-        db.rollback()
-        print("❌ Ошибка при привязке канала:", e)
-        return jsonify({'error': 'Database error'}), 500
-    finally:
-        db.close()
-
 
 @app.route('/auth/vk/callback', methods=['POST'])
 def vk_callback():
