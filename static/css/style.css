@@ -23,17 +23,35 @@ header {
 }
 
 .platforms {
-    flex: 0 1 150px;
+    flex: 0 1 220px;
+    display: grid;
+    gap: 20px;
+    grid-template-columns: 1fr auto;
+    align-items: center;
 }
 
 .platforms label {
-    display: block;
-    margin-bottom: 10px;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
-.platforms button {
-    padding: 12px 24px;
+.platform-button {
+    justify-self: end;
+    padding: 6px 10px;
+    font-size: 12px;
+    background-color: #0088cc;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
 }
+
+.platform-button:hover {
+    background-color: #006699;
+}
+
 
 .form-group {
     margin-bottom: 15px;
