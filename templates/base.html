@@ -90,16 +90,15 @@
                 
                 <div class="platforms-container">
                     <p>Платформы</p>
-                    <div></div> <!-- Пустая ячейка для заголовка -->
+                    <div></div>
                     <div class="platforms">
-                        <!-- Telegram -->
+ 
                         <label>
                             <input type="checkbox" name="platforms" value="telegram"> 
                             Telegram
                         </label>
-                        <button type="button" class="platform-button" onclick="tgAuth()">Привязать</button>
+                        <button type="button" id="telegram-button" class="platform-button" onclick="toggleInfo('telegram')">Привязать</button>
 
-                        <!-- Яндекс Дзен -->
                         <div class="sub-option">
                             <label>
                                 <input type="checkbox" id="zenCheckbox" name="platforms" value="yandex"> 
@@ -108,31 +107,24 @@
                         </div>
                         <button type="button" class="platform-button" onclick="zenAuth()">Привязать</button>
 
-
-                        <!-- YouTube -->
                         <label>
                             <input type="checkbox" name="platforms" value="youtube"> 
                             YouTube
                         </label>
-                        <button type="button" class="platform-button" onclick="ytAuth()">Подключить</button>
+                        <div></div>
 
-                        <!-- RuTube -->
                         <div class="sub-option">
                             <label>
                                 <input type="checkbox" id="rutubeCheckbox" name="platforms" value="rutube"> 
                                 RuTube
                             </label>
                         </div>
-                        <button type="button" class="platform-button" onclick="rutubeAuth()">Подключить</button>
+                        <button type="button" class="platform-button" onclick="rutubeAuth()">Привязать</button>
 
-                        <!-- Кнопка "Обработать" — полная ширина -->
-                        <button type="button" onclick="submitForm()" style="grid-column: 1 / -1; margin-top: 16px;">
+                        <button type="button" onclick="submitForm()">
                             Обработать данные
                         </button>
                     </div>
-                    
-
-                    
                 </div>
 
                 <div id="info-telegram" class="info-box" style="display: none;"> 
@@ -142,6 +134,14 @@
                         3. Впишите название вашего канала в поле: <input type="text" id="channel-name" placeholder="Название" required>
                     </p>
                     <button type="button" class="platform-button" id="tg-connect-btn" onclick="tgAuth()">Привязать канал</button>
+                </div>
+
+                <div id="info-zen" class="info-box" style="display: none;">
+
+                </div>
+
+                <div id="info-rutube" class="info-box" style="display: none;">
+
                 </div>
                 
             </div>

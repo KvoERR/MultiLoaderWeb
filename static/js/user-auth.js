@@ -86,11 +86,10 @@ async function authUpdate(data) {
     authBtn.title = 'Выйти';
     authBtn.onclick = function() {
         localStorage.removeItem('token');
-
         location.reload();
     };
     if (data.tg_auth) {
-        activateTgButton();
+        activateButton('telegram');
     }
     localStorage.setItem('token', data.token);
     localStorage.setItem('tg_auth', data.tg_auth);
@@ -127,7 +126,7 @@ async function tgAuth() {
         const result = await response.json();
 
         if (response.ok) {
-            activateTgButton();
+            activateButton('telegram');
             localStorage.setItem('tg_auth', true);
             document.getElementById('info-telegram').style.display = 'none';
         } else {
@@ -141,8 +140,11 @@ async function tgAuth() {
     }
 }
 
-async function activateTgButton() {
-    tgInfoBtn.style.backgroundColor = 'green';
+async function activateButton(platform) {
+    const button = document.getElementById(`${platform}-button`);
+    button.style.backgroundColor = 'green';
+    button.style.color = 'white';
+    button.textContent='Привязано';
 }
 
 // Закрытие попапа по клику на подложку
@@ -172,6 +174,9 @@ window.addEventListener('load', function() {
             localStorage.removeItem('token');
             location.reload();
         };
+        if (localStorage.getItem('token')) {
+            activateButton('telegram');
+        }
     } else {
         authBtn.textContent = 'ℹ️';
         authBtn.title = 'Войти';

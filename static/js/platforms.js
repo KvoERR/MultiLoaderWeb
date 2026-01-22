@@ -22,10 +22,13 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function toggleInfo(platform) {
+    const button = document.getElementById(`${platform}-button`);
     const box = document.getElementById(`info-${platform}`);
     if (box.style.display === 'none' || box.style.display === '') {
         box.style.display = 'block';
+        button.style.backgroundColor = 'yellow';
     } else {
         box.style.display = 'none';
+        button.style.backgroundColor = '#f0f0f0';
     }
 }
