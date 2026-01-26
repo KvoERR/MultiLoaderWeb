@@ -105,7 +105,7 @@
                                 Яндекс Дзен
                             </label>
                         </div>
-                        <button type="button" class="platform-button" onclick="zenAuth()">Привязать</button>
+                        <button type="button" class="platform-button" onclick="toggleInfo('zen')">Привязать</button>
 
                         <label>
                             <input type="checkbox" name="platforms" value="youtube"> 
@@ -119,7 +119,7 @@
                                 RuTube
                             </label>
                         </div>
-                        <button type="button" class="platform-button" onclick="rutubeAuth()">Привязать</button>
+                        <button type="button" class="platform-button" onclick="toggleInfo('rutube')">Привязать</button>
 
                         <button type="button" onclick="submitForm()">
                             Обработать данные
@@ -137,11 +137,15 @@
                 </div>
 
                 <div id="info-zen" class="info-box" style="display: none;">
-
+                    <p>
+                        <a href="https://dzen.ru/help/ru/channel/cross-platform.html">Руководство</a> по настройке автоматической публикации
+                    </p>
                 </div>
 
                 <div id="info-rutube" class="info-box" style="display: none;">
-
+                    <p>
+                        Автоматическую публикацию можно настроить в <a href="https://studio.rutube.ru/channel-settings#show-youtube-import">личном кабинете</a>
+                    </p>
                 </div>
                 
             </div>
