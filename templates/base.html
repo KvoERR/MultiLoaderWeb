@@ -6,8 +6,11 @@
     <!-- Возможность переопределения заголовка -->
     <title>{% block title %}MultiLoader{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/drop.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/radio.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/form.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/file.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/publicity.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/platforms.css') }}">
 </head>
 <body>
     <header>
@@ -105,7 +108,7 @@
                                 Яндекс Дзен
                             </label>
                         </div>
-                        <button type="button" class="platform-button" onclick="toggleInfo('zen')">Привязать</button>
+                        <button type="button" id="zen-button" class="platform-button" onclick="toggleInfo('zen')">Привязать</button>
 
                         <label>
                             <input type="checkbox" name="platforms" value="youtube"> 
@@ -119,7 +122,7 @@
                                 RuTube
                             </label>
                         </div>
-                        <button type="button" class="platform-button" onclick="toggleInfo('rutube')">Привязать</button>
+                        <button type="button" id="rutube-button" class="platform-button" onclick="toggleInfo('rutube')">Привязать</button>
 
                         <button type="button" onclick="submitForm()">
                             Обработать данные
@@ -129,7 +132,7 @@
 
                 <div id="info-telegram" class="info-box" style="display: none;"> 
                     <p>
-                        1. Добавьте в качестве администратора в свой канал бота <a href="https://t.me/multi_loaderbot">@multi_loaderbot</a><br>
+                        1. Добавьте в качестве администратора в свой канал бота <a href="https://t.me/multi_loaderbot" target="_blank">@multi_loaderbot</a><br>
                         2. Напишите в свой канал полное название вашего канала<br>
                         3. Впишите название вашего канала в поле: <input type="text" id="channel-name" placeholder="Название" required>
                     </p>
@@ -138,13 +141,13 @@
 
                 <div id="info-zen" class="info-box" style="display: none;">
                     <p>
-                        <a href="https://dzen.ru/help/ru/channel/cross-platform.html">Руководство</a> по настройке автоматической публикации
+                        <a href="https://dzen.ru/help/ru/channel/cross-platform.html" target="_blank">Руководство</a> по настройке автоматической публикации
                     </p>
                 </div>
 
                 <div id="info-rutube" class="info-box" style="display: none;">
                     <p>
-                        Автоматическую публикацию можно настроить в <a href="https://studio.rutube.ru/channel-settings#show-youtube-import">личном кабинете</a>
+                        Автоматическую публикацию можно настроить в <a href="https://studio.rutube.ru/channel-settings#show-youtube-import" target="_blank">личном кабинете</a>
                     </p>
                 </div>
                 

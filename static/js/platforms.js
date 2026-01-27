@@ -26,33 +26,29 @@ function toggleInfo(platform) {
     const targetBox = document.getElementById(`info-${platform}`);
     const targetButton = document.getElementById(`${platform}-button`);
 
-    // Если целевой блок не найден — выходим
     if (!targetBox) return;
 
-    // Сохраняем оригинальный цвет кнопки при первом клике
     if (!targetButton.dataset.originalColor) {
         targetButton.dataset.originalColor = getComputedStyle(targetButton).backgroundColor;
+        targetButton.dataset.originalTextColor = getComputedStyle(targetButton).color;
     }
 
-    // Проверяем, открыт ли целевой блок СЕЙЧАС
     const isOpen = targetBox.style.display === 'block';
 
-    // Сначала закрываем ВСЕ блоки
     allBoxes.forEach(box => {
         const button = document.getElementById(box.id.replace('info-', '') + '-button');
         box.style.display = 'none';
         if (button && button.dataset.originalColor) {
             button.style.backgroundColor = button.dataset.originalColor;
+            button.style.color = button.dataset.originalTextColor;
         }
     });
 
-    // Если целевой блок был открыт — мы его уже закрыли → ничего больше не делаем
     if (isOpen) {
-        // Уже закрыт, ничего не открываем
         return;
     }
 
-    // Иначе — открываем целевой блок
     targetBox.style.display = 'block';
-    targetButton.style.backgroundColor = 'yellow';
+    targetButton.style.backgroundColor = 'orange';
+    targetButton.style.color = 'black';
 }
