@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Возможность переопределения заголовка -->
     <title>{% block title %}MultiLoader{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
@@ -114,7 +113,7 @@
                             <input type="checkbox" name="platforms" value="youtube"> 
                             YouTube
                         </label>
-                        <div></div>
+                        <button type="button" id="youtube-button" class="platform-button" onclick="window.location.href = '/auth/youtube/login';">Привязать</button>
 
                         <div class="sub-option">
                             <label>
@@ -162,20 +161,17 @@
             <div class="popup-content">
                 <span class="close-btn" onclick="closeAuthPopup()">&times;</span>
 
-                <!-- Вкладки: Вход / Регистрация -->
                 <div class="auth-tabs">
                     <button id="loginTabBtn" class="tab-btn active" onclick="switchAuthTab('login')">Вход</button>
                     <button id="registerTabBtn" class="tab-btn" onclick="switchAuthTab('register')">Регистрация</button>
                 </div>
 
-                <!-- Форма Входа -->
                 <form id="loginForm" class="auth-form" onsubmit="login(event)">
                     <input type="text" placeholder="Логин" name="username" required />
                     <input type="password" placeholder="Пароль" name="password" required />
                     <button type="submit">Войти</button>
                 </form>
 
-                <!-- Форма Регистрации -->
                 <form id="registerForm" class="auth-form" style="display: none;" onsubmit="register(event)">
                     <input type="text" placeholder="Логин" name="username" required />
                     <input type="password" placeholder="Пароль" name="password" required />
@@ -188,10 +184,12 @@
 
     <footer>
     </footer>
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://unpkg.com/@vkid/sdk@<3.0.0/dist-sdk/umd/index.js"></script>
     <script type="module" src="{{ url_for('static', filename='js/form-handler.js') }}"></script>
     <script src="{{ url_for('static', filename='js/file-explorer.js') }}"></script>
     <script src="{{ url_for('static', filename='js/platforms.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/user-auth.js') }}"></script>
-    
+    <script type="module" src="{{ url_for('static', filename='js/user-auth.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/telegram-auth.js') }}"></script> 
 </html>

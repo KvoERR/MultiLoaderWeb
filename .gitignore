@@ -1,6 +1,8 @@
 uploads/
 temp_*
 client_secret.json
+client_secret_web.json
+client_secret_installed.json
 token.json
 *.mp4
 *.jpg

@@ -1,3 +1,4 @@
+import { activateButton } from './authorization.js'
 const authPopup = document.getElementById('auth-popup');
 const loginForm = document.getElementById('loginForm');
 const registerForm = document.getElementById('registerForm');
@@ -79,72 +80,6 @@ async function register(e) {
     } else {
         alert('Ошибка: ' + data.error);
     }
-}
-
-async function authUpdate(data) {
-    authBtn.textContent = '👤';
-    authBtn.title = 'Выйти';
-    authBtn.onclick = function() {
-        localStorage.removeItem('token');
-        location.reload();
-    };
-    if (data.tg_auth) {
-        activateButton('telegram');
-    }
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('tg_auth', data.tg_auth);
-    console.log('tg_auth: ' + data.tg_auth);
-    closeAuthPopup();
-}
-
-async function tgAuth() {
-    if (!channelName.value.trim()) {
-        alert('Введите название канала');
-        return;
-    }
-
-    const token = localStorage.getItem('token');
-    if (!token) {
-        alert('Вы не авторизованы');
-        openAuthPopup('login');
-        return;
-    }
-
-    tgAuthBtn.disabled = true;
-    tgAuthBtn.textContent = 'Привязываем...';
-
-    try {
-        const response = await fetch('/auth/tg', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + token
-            },
-            body: JSON.stringify({ channel_name: channelName.value.trim() })
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-            activateButton('telegram');
-            localStorage.setItem('tg_auth', true);
-            document.getElementById('info-telegram').style.display = 'none';
-        } else {
-            alert('Ошибка: ' + result.error);
-        }
-    } catch (err) {
-        alert('Ошибка подключения: ' + err.message);
-    } finally {
-        tgAuthBtn.disabled = false;
-        tgAuthBtn.textContent = 'Привязать канал';
-    }
-}
-
-async function activateButton(platform) {
-    const button = document.getElementById(`${platform}-button`);
-    button.style.backgroundColor = 'green';
-    button.style.color = 'white';
-    button.textContent='Привязано';
 }
 
 // Закрытие попапа по клику на подложку

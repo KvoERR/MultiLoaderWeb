@@ -23,34 +23,30 @@
     opacity: 0.6;
 }
 
-/* Стили для информационных блоков */
 .info-box {
-    /* Фиксированный размер */
     width: 320px;
     min-height: 120px;
+    margin-top:10px;
 
-    /* Расположение внутри .platforms (grid) */
-    grid-column: span 2; /* Занимает всю ширину сетки */
+    grid-column: span 2;
 
-    /* Внешний вид */
     background-color: #f8f9fa;
     border: 1px solid #dee2e6;
     border-radius: 8px;
     padding: 16px;
 
-    /* Типографика */
+
     font-size: 14px;
     color: #212529;
     line-height: 1.5;
 
-    /* Тень при открытии */
+
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
-    /* Чтобы не "прыгал" макет */
+
     overflow: hidden;
 }
 
-/* Ссылки внутри info-box */
 .info-box a {
     color: #007bff;
     text-decoration: none;
@@ -60,7 +56,6 @@
     text-decoration: underline;
 }
 
-/* Кнопка внутри info-box */
 .info-box button {
     margin-top: 12px;
     padding: 8px 12px;

@@ -4,7 +4,7 @@ import base64
 import flask
 import secrets
 import requests
-from flask import Flask, render_template, request, jsonify, g
+from flask import Flask, render_template, request, jsonify, session, redirect
 import jwt
 import datetime
 import bcrypt
@@ -14,6 +14,10 @@ from utils import VK, YouTube, Telegram
 from sqlalchemy import create_engine, Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 from dotenv import load_dotenv
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
+from google_auth_oauthlib.flow import Flow
+
 
 load_dotenv()
 
@@ -249,10 +253,11 @@ def process_form():
         video_path=get_file_path(video_file)
         image_path=get_file_path(image_file)
 
-        yt_result = 'None'
+        youtube_result = 'None'
         vk_result = 'None'
         if 'youtube' in platforms:
-            yt_result = YouTube.VideoUploader.upload_video(
+            youtube_uploader = YouTube.VideoUploader(flask.session['youtube_creds'])
+            youtube_result = youtube_uploader.upload_video(
                 title=title,
                 description=description,
                 video=video_path,
@@ -279,7 +284,7 @@ def process_form():
 
         return jsonify({
             'success': True,
-            'yt_result': yt_result,
+            'youtube_result': youtube_result,
             'vk_result': vk_result,
             'message': 'Данные успешно получены и обработаны'
         }) 
@@ -290,6 +295,69 @@ def process_form():
             'error': f'Внутренняя ошибка сервера: {str(e)}'
         })
 
+@app.route('/auth/youtube/login')
+def youtube_login():
+    # Создаём flow
+    flow = Flow.from_client_secrets_file(
+        'secrets/client_secret_web.json',
+        scopes=['https://www.googleapis.com/auth/youtube.upload'],
+        redirect_uri='http://localhost:5000/auth/youtube/callback'
+    )
+
+    # Генерируем URL авторизации
+    authorization_url, state = flow.authorization_url(
+        access_type='offline',      # ← чтобы получить refresh_token
+        include_granted_scopes='true',
+        prompt='consent'            # ← гарантирует выдачу refresh_token
+    )
+
+    # Сохраняем state в сессии
+    session['oauth_state'] = state
+
+    return redirect(authorization_url)
+
+@app.route('/auth/youtube/callback')
+def youtube_callback():
+    # Проверяем state
+    state = session.get('oauth_state')
+    if not state or state != request.args.get('state'):
+        return jsonify({'error': 'Invalid state'}), 400
+
+    # Получаем code из URL
+    code = request.args.get('code')
+    if not code:
+        return jsonify({'error': 'Authorization code not found'}), 400
+
+    try:
+        # Создаём flow
+        flow = Flow.from_client_secrets_file(
+            'secrets/client_secret_web.json',
+            scopes=['https://www.googleapis.com/auth/youtube.upload'],
+            redirect_uri='http://localhost:5000/auth/youtube/callback',
+            state=state
+        )
+
+        # Обмениваем code на токены
+        flow.fetch_token(code=code)
+
+        creds = flow.credentials
+
+        # Сохраняем в сессию
+        session['yt_creds'] = {
+            'token': creds.token,
+            'refresh_token': creds.refresh_token,
+            'token_uri': creds.token_uri,
+            'client_id': creds.client_id,
+            'client_secret': creds.client_secret,
+            'scopes': creds.scopes
+        }
+        
+        # Перенаправляем обратно на главную
+        return redirect('/')
+
+    except Exception as e:
+        print(f"Ошибка авторизации YouTube: {e}")
+        return jsonify({'error': str(e)}), 500
 @app.route('/auth/vk/callback', methods=['POST'])
 def vk_callback():
     try:
@@ -333,4 +401,4 @@ def vk_callback():
 
 if __name__ == '__main__':
     init_db()
-    app.run(debug=True, port=80, host='localhost')
+    app.run(debug=True, port=5000, host='localhost')

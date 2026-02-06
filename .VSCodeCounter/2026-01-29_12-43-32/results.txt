@@ -1,0 +1,52 @@
+Date : 2026-01-29 12:43:32
+Directory : c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader
+Total : 19 files,  1497 codes, 92 comments, 283 blanks, all 1872 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| JavaScript |          7 |        532 |         48 |        107 |        687 |
+| Python     |          5 |        496 |         24 |        100 |        620 |
+| PostCSS    |          6 |        288 |         16 |         49 |        353 |
+| HTML       |          1 |        181 |          4 |         27 |        212 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                               | files      | code       | comment    | blank      | total      |
++------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                  |         19 |      1,497 |         92 |        283 |      1,872 |
+| . (Files)                                                                          |          2 |        310 |          8 |         59 |        377 |
+| static                                                                             |         13 |        820 |         64 |        156 |      1,040 |
+| static\css                                                                         |          6 |        288 |         16 |         49 |        353 |
+| static\js                                                                          |          7 |        532 |         48 |        107 |        687 |
+| templates                                                                          |          1 |        181 |          4 |         27 |        212 |
+| utils                                                                              |          3 |        186 |         16 |         41 |        243 |
++------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                           | language   | code       | comment    | blank      | total      |
++------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\app.py                     | Python     |        300 |          8 |         57 |        365 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\controller.py              | Python     |         10 |          0 |          2 |         12 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\css\auth.css        | PostCSS    |        113 |          7 |         15 |        135 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\css\file.css        | PostCSS    |         52 |          0 |         10 |         62 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\css\form.css        | PostCSS    |         40 |          0 |          5 |         45 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\css\platforms.css   | PostCSS    |         47 |          9 |         12 |         68 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\css\publicity.css   | PostCSS    |         25 |          0 |          6 |         31 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\css\style.css       | PostCSS    |         11 |          0 |          1 |         12 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\js\file-explorer.js | JavaScript |         99 |         12 |         22 |        133 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\js\form-handler.js  | JavaScript |         84 |         14 |         21 |        119 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\js\platforms.js     | JavaScript |         40 |          3 |         12 |         55 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\js\tag-request.js   | JavaScript |          5 |          0 |          3 |          8 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\js\user-auth.js     | JavaScript |        154 |          7 |         28 |        189 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\js\vk-auth.js       | JavaScript |         96 |          6 |         13 |        115 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\js\youtube-auth.js  | JavaScript |         54 |          6 |          8 |         68 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\templates\base.html        | HTML       |        181 |          4 |         27 |        212 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\utils\Telegram.py          | Python     |         58 |          2 |         13 |         73 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\utils\VK.py                | Python     |         35 |          3 |         10 |         48 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\utils\YouTube.py           | Python     |         93 |         11 |         18 |        122 |
+| Total                                                                              |            |      1,497 |         92 |        283 |      1,872 |
++------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+

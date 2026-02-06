@@ -19,15 +19,8 @@ window.submitForm = async function() {
 
     // Собираем данные формы
     const formData = new FormData(form);
-    
-    /*console.log('FormData содержимое:');
-    for (let [key, value] of formData.entries()) {
-        console.log(key + ': ', value);
-    }*/
-
 
     if (document.querySelector('input[value="vk"]:checked')) {
-        console.log('VK auth started');
         const vkAuth = new VKAuth();
         await vkAuth.startAuth();
     }
