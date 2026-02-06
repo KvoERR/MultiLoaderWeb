@@ -94,6 +94,11 @@
                     <p>Платформы</p>
                     <div></div>
                     <div class="platforms">
+                        <label>
+                            <input type="checkbox" name="platforms" value="youtube"> 
+                            YouTube
+                        </label>
+                        <button type="button" id="youtube-button" class="platform-button" onclick="window.location.href = '/auth/youtube/login';">Привязать</button>
  
                         <label>
                             <input type="checkbox" name="platforms" value="telegram"> 
@@ -101,26 +106,22 @@
                         </label>
                         <button type="button" id="telegram-button" class="platform-button" onclick="toggleInfo('telegram')">Привязать</button>
 
-                        <div class="sub-option">
-                            <label>
-                                <input type="checkbox" id="zenCheckbox" name="platforms" value="yandex"> 
-                                Яндекс Дзен
-                            </label>
-                        </div>
+                        <label>
+                            <input type="checkbox" name="platforms" value="vk"> 
+                            VK
+                        </label>
+                        <button type="button" id="vk-button" class="platform-button" onclick="toggleInfo('vk')">Привязать</button>
+
+                        <label>
+                            <input type="checkbox" id="zenCheckbox" name="platforms" value="yandex"> 
+                            Яндекс Дзен
+                        </label>
                         <button type="button" id="zen-button" class="platform-button" onclick="toggleInfo('zen')">Привязать</button>
 
                         <label>
-                            <input type="checkbox" name="platforms" value="youtube"> 
-                            YouTube
+                            <input type="checkbox" id="rutubeCheckbox" name="platforms" value="rutube"> 
+                            RuTube
                         </label>
-                        <button type="button" id="youtube-button" class="platform-button" onclick="window.location.href = '/auth/youtube/login';">Привязать</button>
-
-                        <div class="sub-option">
-                            <label>
-                                <input type="checkbox" id="rutubeCheckbox" name="platforms" value="rutube"> 
-                                RuTube
-                            </label>
-                        </div>
                         <button type="button" id="rutube-button" class="platform-button" onclick="toggleInfo('rutube')">Привязать</button>
 
                         <button type="button" onclick="submitForm()">
@@ -190,6 +191,7 @@
     <script type="module" src="{{ url_for('static', filename='js/form-handler.js') }}"></script>
     <script src="{{ url_for('static', filename='js/file-explorer.js') }}"></script>
     <script src="{{ url_for('static', filename='js/platforms.js') }}"></script>
-    <script type="module" src="{{ url_for('static', filename='js/user-auth.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/telegram-auth.js') }}"></script> 
+    <script src="{{ url_for('static', filename='js/user-auth.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/telegram-auth.js') }}"></script> 
+    <script type="module" src="{{ url_for('static', filename='js/auth.js') }}"></script> 
 </html>

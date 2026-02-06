@@ -11,7 +11,7 @@ import bcrypt
 import os
 from flask_cors import CORS
 from utils import VK, YouTube, Telegram
-from sqlalchemy import create_engine, Column, Integer, String, DateTime, ForeignKey
+from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime, ForeignKey
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 from dotenv import load_dotenv
 from google.oauth2 import id_token
@@ -40,8 +40,8 @@ class User(Base):
     username = Column(String(50), unique=True, nullable=False)
     password_hash = Column(String(128), nullable=False)
     tg_chat_id = Column(Integer)
-    tg_chat_name = Column(String(50))
-    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    yt_auth = Column(Boolean, default=False)
+
 
 def init_db():
     Base.metadata.create_all(bind=engine)
@@ -111,7 +111,8 @@ def register():
 
         return jsonify({
                 'token': token,
-                'tg_auth': user.tg_chat_name is not None
+                'tg_auth': user.tg_chat_id is not None,
+                'yt_auth': user.yt_auth
         }), 201
 
     except Exception as e:
@@ -138,12 +139,14 @@ def login():
             
             return jsonify({
                 'token': token,
-                'tg_auth': user.tg_chat_name is not None
+                'tg_auth': user.tg_chat_id is not None,
+                'yt_auth': user.yt_auth
             })
             
         else:
             return jsonify({'error': 'Неверный логин или пароль'}), 401
     except Exception as e:
+        print(f"[ERROR] /login: {type(e).__name__}: {e}") 
         return jsonify({'error': 'Ошибка сервера'}), 500
     finally:
         db.close()
@@ -189,7 +192,6 @@ def tg_auth():
         if not user:
             return jsonify({'error': 'User not found'}), 404
 
-        user.tg_chat_name = channel_name
         user.tg_chat_id = chat_id
         db.commit()
 
@@ -306,9 +308,9 @@ def youtube_login():
 
     # Генерируем URL авторизации
     authorization_url, state = flow.authorization_url(
-        access_type='offline',      # ← чтобы получить refresh_token
+        access_type='offline',
         include_granted_scopes='true',
-        prompt='consent'            # ← гарантирует выдачу refresh_token
+        prompt='consent'
     )
 
     # Сохраняем state в сессии
@@ -343,7 +345,7 @@ def youtube_callback():
         creds = flow.credentials
 
         # Сохраняем в сессию
-        session['yt_creds'] = {
+        session['youtube_creds'] = {
             'token': creds.token,
             'refresh_token': creds.refresh_token,
             'token_uri': creds.token_uri,
