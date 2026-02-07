@@ -98,7 +98,7 @@
                             <input type="checkbox" name="platforms" value="youtube"> 
                             YouTube
                         </label>
-                        <button type="button" id="youtube-button" class="platform-button" onclick="window.location.href = '/auth/youtube/login';">Привязать</button>
+                        <button type="button" id="youtube-button" class="platform-button" onclick="toggleInfo('youtube')">Привязать</button>
  
                         <label>
                             <input type="checkbox" name="platforms" value="telegram"> 
@@ -128,6 +128,10 @@
                             Обработать данные
                         </button>
                     </div>
+                </div>
+
+                <div id="info-youtube" class="info-box" style="display: none;">
+                    <button type="button" id="youtube-button" class="platform-button" onclick="connectYouTube()">Войти с Google</button>
                 </div>
 
                 <div id="info-telegram" class="info-box" style="display: none;"> 
@@ -193,5 +197,6 @@
     <script src="{{ url_for('static', filename='js/platforms.js') }}"></script>
     <script src="{{ url_for('static', filename='js/user-auth.js') }}"></script>
     <script type="module" src="{{ url_for('static', filename='js/telegram-auth.js') }}"></script> 
+    <script src="{{ url_for('static', filename='js/youtube-auth.js') }}"></script> 
     <script type="module" src="{{ url_for('static', filename='js/auth.js') }}"></script> 
 </html>

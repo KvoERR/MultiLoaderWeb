@@ -1,5 +1,6 @@
 window.addEventListener('load', function() {
     const token = localStorage.getItem('token');
+    
 
     if (!authBtn) return;
 
@@ -10,8 +11,11 @@ window.addEventListener('load', function() {
             localStorage.removeItem('token');
             location.reload();
         };
-        if (localStorage.getItem('token')) {
+        if (localStorage.getItem('tg_auth')) {
             activateButton('telegram');
+        }
+        if (localStorage.getItem('yt_auth')) {
+            activateButton('youtube');
         }
     } else {
         authBtn.textContent = 'ℹ️';
