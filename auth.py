@@ -22,7 +22,6 @@ def youtube_login():
     )
     authorization_url, state = flow.authorization_url(
         access_type='offline',
-        include_granted_scopes=True,
         prompt='consent'
     )
     session['oauth_state'] = state
@@ -41,7 +40,7 @@ def youtube_callback():
     try:
         flow = Flow.from_client_secrets_file(
             'secrets/client_secret_web.json',
-            scopes=['https://www.googleapis.com/auth.youtube.upload'],
+            scopes=['https://www.googleapis.com/auth/youtube.upload'],
             redirect_uri='http://localhost:5000/auth/youtube/callback',
             state=state
         )
@@ -56,7 +55,7 @@ def youtube_callback():
             'client_secret': creds.client_secret,
             'scopes': creds.scopes
         }
-        
+        session['yt_auth']=True
         return redirect('/')
     except Exception as e:
         print(f"Ошибка авторизации YouTube: {e}")

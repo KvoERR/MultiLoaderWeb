@@ -1,4 +1,3 @@
-
 const authPopup = document.getElementById('auth-popup');
 const loginForm = document.getElementById('loginForm');
 const registerForm = document.getElementById('registerForm');

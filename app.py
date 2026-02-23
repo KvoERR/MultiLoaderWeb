@@ -58,19 +58,6 @@ def verify_password(password, hash):
 
 @app.route('/')
 def home():
-    token = request.cookies.get('token')  # JWT из кук
-    yt_auth = False
-
-    if token:
-        try:
-            payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
-            db = SessionLocal()
-            user = db.query(User).filter(User.id == payload['user_id']).first()
-            if user:
-                yt_auth = user.yt_auth
-            db.close()
-        except:
-            pass
     return render_template('base.html')
 
 @app.route('/register', methods=['POST'])
@@ -140,6 +127,45 @@ def login():
         return jsonify({'error': 'Ошибка сервера'}), 500
     finally:
         db.close()
+
+@app.route('/authz', methods=['POST'])
+def authz():
+    auth_header = request.headers.get('Authorization')
+    if not auth_header or not auth_header.startswith('Bearer '):
+        return jsonify({'success': False, 'error': 'Требуется авторизация'}), 401
+
+    token = auth_header[7:]
+
+    try:
+        payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+        user_id = payload['user_id']
+    except jwt.ExpiredSignatureError:
+        return jsonify({'success': False, 'error': 'Токен истёк'}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({'success': False, 'error': 'Неверный токен'}), 401
+    
+    yt_auth = session.get('yt_auth', False)
+
+    db = SessionLocal()
+    try:
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user:
+            return jsonify({'success': False, 'error': 'Пользователь не найден'}), 404
+
+        return jsonify({
+            'success': True,
+            'token': token,
+            'yt_auth': yt_auth,
+            'tg_auth': user.tg_chat_id is not None
+        }), 200
+
+    except Exception as e:
+        print(f"Ошибка в /authz: {e}")
+        return jsonify({'success': False, 'error': 'Ошибка сервера'}), 500
+    finally:
+        db.close()
+
+
 
 @app.route('/process', methods=['POST'])
 def process_form():

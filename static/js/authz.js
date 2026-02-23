@@ -1,29 +1,5 @@
 window.addEventListener('load', function() {
-    const token = localStorage.getItem('token');
-    
-
-    if (!authBtn) return;
-
-    if (token) {
-        authBtn.textContent = '👤';
-        authBtn.title = 'Выйти';
-        authBtn.onclick = function() {
-            localStorage.removeItem('token');
-            location.reload();
-        };
-        if (localStorage.getItem('tg_auth')) {
-            activateButton('telegram');
-        }
-        if (localStorage.getItem('yt_auth')) {
-            activateButton('youtube');
-        }
-    } else {
-        authBtn.textContent = 'ℹ️';
-        authBtn.title = 'Войти';
-        authBtn.onclick = function() {
-            openAuthPopup('login');
-        };
-    }
+    authz();
 });
 
 export function activateButton(platform) {
@@ -51,3 +27,36 @@ export function authUpdate(data) {
     console.log('tg_auth: ' + data.tg_auth);
     closeAuthPopup();
 }
+
+export async function authz() {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.error('Токен не найден');
+        return { success: false, error: 'Не авторизован' };
+    }
+
+    try {
+        const response = await fetch('/authz', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer ' + token
+            },
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.success) {
+            authUpdate(data);
+            return { success: true, data };
+        } else {
+            console.error('Ошибка привязки:', data.error);
+            return { success: false, error: data.error };
+        }
+    } catch (error) {
+        console.error('Сетевая ошибка:', error);
+        return { success: false, error: 'Не удалось подключиться к серверу' };
+    }
+}
+
+//нужно написать функцию, отправляющую POST на /login - это авторизация, будем вызывать при изменениях
