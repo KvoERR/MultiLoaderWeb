@@ -1,4 +1,5 @@
 export class VKAuth {
+    client_id = '54311529'
     redirect_url = 'http://localhost:80/auth/vk/callback'
     APP_NAME = 'MultiLoader'
     generateState() {
@@ -53,11 +54,11 @@ export class VKAuth {
 
         // Инициализация VK ID SDK
         VKID.Config.init({
-            app: this.client_id,
-            redirectUrl: this.redirect_url,
-            state: state,
-            codeChallenge: codeChallenge,
-            scope: 'video',
+            app: this.client_id, //id приложения
+            redirectUrl: this.redirect_url, //адрес для редиректа
+            state: state, //state для защиты от CSRF
+            codeChallenge: codeChallenge, //код верификатор
+            scope: 'video groups wall', 
             responseMode: VKID.ConfigResponseMode.Callback
         });
 

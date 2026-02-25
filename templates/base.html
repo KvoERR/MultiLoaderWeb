@@ -143,6 +143,10 @@
                     <button type="button" class="platform-button" id="tg-connect-btn" onclick="tgAuth()">Привязать канал</button>
                 </div>
 
+                <div id="info-vk" class="info-box" style="display: none;">
+                    <button type="button" id="vk-button" class="platform-button" onclick="connectYouTube()">Войти с ВК</button>
+                </div>
+
                 <div id="info-zen" class="info-box" style="display: none;">
                     <p>
                         <a href="https://dzen.ru/help/ru/channel/cross-platform.html" target="_blank">Руководство</a> по настройке автоматической публикации
@@ -191,12 +195,11 @@
     </footer>
 
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <script src="https://unpkg.com/@vkid/sdk@<3.0.0/dist-sdk/umd/index.js"></script>
+    <script src="https://unpkg.com/@vkid/sdk@<2.6.1/dist-sdk/umd/index.js"></script>
     <script type="module" src="{{ url_for('static', filename='js/auth/form-handler.js') }}"></script>
     <script src="{{ url_for('static', filename='js/interface/file-explorer.js') }}"></script>
     <script src="{{ url_for('static', filename='js/interface/platforms.js') }}"></script>
     <script src="{{ url_for('static', filename='js/interface/auth-popup.js') }}"></script>
     <script type="module" src="{{ url_for('static', filename='js/auth/telegram-auth.js') }}"></script> 
-    <script src="{{ url_for('static', filename='js/auth/youtube-auth.js') }}"></script> 
     <script type="module" src="{{ url_for('static', filename='js/auth/auth.js') }}"></script> 
 </html>

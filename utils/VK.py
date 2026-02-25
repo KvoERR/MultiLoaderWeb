@@ -24,7 +24,7 @@ class VideoUploader:
                 print("Файл очень большой, загрузка может занять время")
             
             # Загружаем видео
-            upload_url = self.api.video.save(
+            video_info = self.api.video.save(
                 video_file=video_path,
                 name=title,
                 description=description,
@@ -33,13 +33,15 @@ class VideoUploader:
                 no_comments=False,
                 repeat=True
             )
+            #print(video_path)
+            upload_url = video_info['upload_url']
 
-            upload_response = requests.post(
-                upload_url,
-                files={'video_file': video_path}
-            )
-            
-            print(upload_response.json())
+            with open(video_path, 'rb') as f:
+                file = {'video_file': f}
+                upload_response = requests.post(upload_url, files=file)
+
+            # Шаг 3: НЕ парсим JSON, если ответ пустой
+            #print(f"Статус загрузки: {upload_response.status_code}")
             
             return upload_response
             

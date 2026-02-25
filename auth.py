@@ -9,16 +9,19 @@ from models import User, SessionLocal
 auth_bp = Blueprint('auth', __name__)
 
 # Переменные
+
 bot_token = os.getenv('TG_BOT_TOKEN')
 app_id = "54311529"
 SECRET_KEY = os.getenv('SECRET_KEY')
+YOUTUBE_URI = os.getenv('GOOGLE_REDIRECT_URI')
+VK_URI = os.getenv('VK_REDIRECT_URI')
 
 @auth_bp.route('/auth/youtube/login')
 def youtube_login():
     flow = Flow.from_client_secrets_file(
         'secrets/client_secret_web.json',
         scopes=['https://www.googleapis.com/auth/youtube.upload'],
-        redirect_uri='http://localhost:5000/auth/youtube/callback'
+        redirect_uri=YOUTUBE_URI
     )
     authorization_url, state = flow.authorization_url(
         access_type='offline',
@@ -41,7 +44,7 @@ def youtube_callback():
         flow = Flow.from_client_secrets_file(
             'secrets/client_secret_web.json',
             scopes=['https://www.googleapis.com/auth/youtube.upload'],
-            redirect_uri='http://localhost:5000/auth/youtube/callback',
+            redirect_uri=YOUTUBE_URI,
             state=state
         )
         flow.fetch_token(code=code)
@@ -116,6 +119,7 @@ def vk_callback():
     if not data:
         return jsonify({'error': 'No data provided'}), 400
 
+    state = data.get('state')
     code = data.get('code')
     code_verifier = data.get('code_verifier')
     device_id = data.get('device_id')
@@ -129,10 +133,11 @@ def vk_callback():
             data={
                 'grant_type': 'authorization_code',
                 'code_verifier': code_verifier,
-                'redirect_uri': 'http://localhost:5000/auth/vk/callback',
+                'redirect_uri': VK_URI,
                 'code': code,
                 'client_id': app_id,
-                'device_id': device_id
+                'device_id': device_id,
+                'state': state
             },
             headers={'Content-Type': 'application/x-www-form-urlencoded'}
         ).json()

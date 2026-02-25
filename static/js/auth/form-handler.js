@@ -1,3 +1,4 @@
+import { connectYouTube } from './youtube-auth.js';
 import { VKAuth } from './vk-auth.js';
 
 window.submitForm = async function() {
@@ -19,6 +20,10 @@ window.submitForm = async function() {
 
     // Собираем данные формы
     const formData = new FormData(form);
+
+    if (document.querySelector('input[value="youtube"]:checked')) {
+        connectYouTube();
+    }
 
     if (document.querySelector('input[value="vk"]:checked')) {
         const vkAuth = new VKAuth();
@@ -87,22 +92,4 @@ function showError(errorMessage) {
     
     // Плавная прокрутка к ошибке
     resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-}
-
-// Дополнительная функция валидации (опционально)
-function validateForm() {
-    const title = document.getElementById('title')?.value.trim();
-    const platforms = document.querySelectorAll('input[name="platforms"]:checked');
-    
-    if (!title) {
-        showError('Пожалуйста, введите название видео');
-        return false;
-    }
-    
-    if (platforms.length === 0) {
-        showError('Пожалуйста, выберите хотя бы одну платформу');
-        return false;
-    }
-    
-    return true;
 }
