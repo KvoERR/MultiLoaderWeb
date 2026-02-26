@@ -1,0 +1,58 @@
+Date : 2026-02-26 12:52:24
+Directory : c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader
+Total : 23 files,  1450 codes, 54 comments, 265 blanks, all 1769 lines
+
+Languages
++------------+------------+------------+------------+------------+------------+
+| language   | files      | code       | comment    | blank      | total      |
++------------+------------+------------+------------+------------+------------+
+| Python     |          6 |        515 |         14 |        100 |        629 |
+| JavaScript |         10 |        467 |         33 |         87 |        587 |
+| PostCSS    |          6 |        289 |          7 |         52 |        348 |
+| HTML       |          1 |        179 |          0 |         26 |        205 |
++------------+------------+------------+------------+------------+------------+
+
+Directories
++----------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                         | files      | code       | comment    | blank      | total      |
++----------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                            |         23 |      1,450 |         54 |        265 |      1,769 |
+| . (Files)                                                                                    |          3 |        350 |          6 |         68 |        424 |
+| static                                                                                       |         16 |        756 |         40 |        139 |        935 |
+| static\css                                                                                   |          6 |        289 |          7 |         52 |        348 |
+| static\js                                                                                    |         10 |        467 |         33 |         87 |        587 |
+| static\js\auth                                                                               |          6 |        304 |         16 |         49 |        369 |
+| static\js\interface                                                                          |          4 |        163 |         17 |         38 |        218 |
+| templates                                                                                    |          1 |        179 |          0 |         26 |        205 |
+| utils                                                                                        |          3 |        165 |          8 |         32 |        205 |
++----------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++----------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| filename                                                                                     | language   | code       | comment    | blank      | total      |
++----------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\app.py                               | Python     |        206 |          3 |         38 |        247 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\auth.py                              | Python     |        126 |          3 |         24 |        153 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\models.py                            | Python     |         18 |          0 |          6 |         24 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\css\auth.css                  | PostCSS    |        113 |          7 |         15 |        135 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\css\file.css                  | PostCSS    |         52 |          0 |         10 |         62 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\css\form.css                  | PostCSS    |         40 |          0 |          5 |         45 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\css\platforms.css             | PostCSS    |         48 |          0 |         15 |         63 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\css\publicity.css             | PostCSS    |         25 |          0 |          6 |         31 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\css\style.css                 | PostCSS    |         11 |          0 |          1 |         12 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\js\auth\auth.js               | JavaScript |         42 |          0 |          8 |         50 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\js\auth\authz.js              | JavaScript |         54 |          1 |          7 |         62 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\js\auth\form-handler.js       | JavaScript |         70 |          9 |         16 |         95 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\js\auth\telegram-auth.js      | JavaScript |         38 |          0 |          5 |         43 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\js\auth\vk-auth.js            | JavaScript |         97 |          6 |         13 |        116 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\js\auth\youtube-auth.js       | JavaScript |          3 |          0 |          0 |          3 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\js\interface\auth-popup.js    | JavaScript |         34 |          5 |          6 |         45 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\js\interface\file-explorer.js | JavaScript |         99 |         12 |         22 |        133 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\js\interface\platforms.js     | JavaScript |         25 |          0 |          7 |         32 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\js\interface\tag-request.js   | JavaScript |          5 |          0 |          3 |          8 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\templates\base.html                  | HTML       |        179 |          0 |         26 |        205 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\utils\Telegram.py                    | Python     |         58 |          2 |         13 |         73 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\utils\VK.py                          | Python     |         34 |          6 |         10 |         50 |
+| c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\utils\YouTube.py                     | Python     |         73 |          0 |          9 |         82 |
+| Total                                                                                        |            |      1,450 |         54 |        265 |      1,769 |
++----------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+

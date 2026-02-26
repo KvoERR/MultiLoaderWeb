@@ -36,12 +36,11 @@ def get_file_path(file_storage):
         'image/gif': '.gif',
         'image/webp': '.webp'
     }
-    extension = mime_to_text.get(file_storage, '.bin')
+    extension = mime_to_text.get(file_storage.content_type, '.bin')
     
-    # Создаем временный файл с правильным расширением
     with tempfile.NamedTemporaryFile(delete=False, suffix=extension) as temp_file:
         file_storage.save(temp_file.name)
-        return temp_file.name  # Возвращаем путь к файлу
+        return temp_file.name
 
 def generate_code_challenge(verifier):
     # SHA-256 хеширование
@@ -165,8 +164,6 @@ def authz():
     finally:
         db.close()
 
-
-
 @app.route('/process', methods=['POST'])
 def process_form():
     try:
@@ -178,8 +175,6 @@ def process_form():
         tags = request.form.get('tags', '').strip()
         privacy = request.form.get('privacy', '')
         platforms = request.form.getlist('platforms')
-
-        print(video_file)
 
         if not title:
             return jsonify({

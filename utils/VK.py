@@ -38,12 +38,11 @@ class VideoUploader:
 
             with open(video_path, 'rb') as f:
                 file = {'video_file': f}
-                upload_response = requests.post(upload_url, files=file)
+                response = requests.post(upload_url, files=file)
 
-            # Шаг 3: НЕ парсим JSON, если ответ пустой
-            #print(f"Статус загрузки: {upload_response.status_code}")
+            print(response)
             
-            return upload_response
+            return response
             
         except Exception as e:
             print(f"Ошибка загрузки: {e}")
