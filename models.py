@@ -18,6 +18,8 @@ class User(Base):
     password_hash = Column(String(128), nullable=False)
     tg_chat_id = Column(Integer)
     yt_auth = Column(Boolean, default=False)
+    vk_group_id = Column(Integer)
 
 def init_db():
     Base.metadata.create_all(bind=engine)
+

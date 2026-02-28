@@ -166,6 +166,19 @@ def authz():
 
 @app.route('/process', methods=['POST'])
 def process_form():
+    if not auth_header or not auth_header.startswith('Bearer '):
+        return jsonify({'success': False, 'error': 'Требуется авторизация'}), 401
+
+    token = auth_header[7:]
+
+    try:
+        payload = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+        user_id = payload['user_id']
+    except jwt.ExpiredSignatureError:
+        return jsonify({'success': False, 'error': 'Токен истёк'}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({'success': False, 'error': 'Неверный токен'}), 401
+    
     try:
         title = request.form.get('title', '').strip()
         description = request.form.get('description', '').strip()
@@ -195,6 +208,15 @@ def process_form():
         video_path=get_file_path(video_file)
         image_path=get_file_path(image_file)
 
+        db = SessionLocal()
+
+        auth_header = request.headers.get('Authorization')
+    
+
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user:
+            return jsonify({'success': False, 'error': 'Пользователь не найден'}), 404
+
         youtube_result = 'None'
         vk_result = 'None'
         if 'youtube' in platforms:
@@ -214,7 +236,9 @@ def process_form():
             vk_result = vk_uploader.upload_video(
                 video_path=video_path,
                 title=title,
-                description=description
+                description=description,
+                privacy=privacy,
+                group_id=user.vk_group_id
             )
 
         if 'telegram' in platforms:

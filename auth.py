@@ -112,6 +112,39 @@ def tg_auth():
     finally:
         db.close()
 
+@auth_bp.route('/auth/vk', methods=['POST'])
+def vk_callback():
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'No data provided'}), 400
+
+    group_id = data.get('group_id', '').strip()
+    if not group_id:
+        return jsonify({'error': 'group_id is required'}), 400
+
+    token = request.headers.get('Authorization')
+    if not token or not token.startswith('Bearer '):
+        return jsonify({'error': 'Authentication required'}), 401
+
+    try:
+        payload = jwt.decode(token[7:], SECRET_KEY, algorithms=['HS256'])
+        user_id = payload['user_id']
+    except jwt.InvalidTokenError:
+        return jsonify({'error': 'Invalid or expired token'}), 401
+
+    db = SessionLocal()
+    try:
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user:
+            return jsonify({'error': 'User not found'}), 404
+        user.vk_group_id = group_id
+        db.commit()
+        return jsonify({'success': True}), 200
+    except Exception as e:
+        db.rollback()
+        return jsonify({'error': 'Database error'}), 500
+    finally:
+        db.close()
 
 @auth_bp.route('/auth/vk/callback', methods=['POST'])
 def vk_callback():
@@ -147,6 +180,5 @@ def vk_callback():
     except Exception as e:
         print(f"Ошибка в /auth/vk/callback: {e}")
         return jsonify({'error': 'Internal server error'}), 500
-
 
 __all__ = ['auth_bp']

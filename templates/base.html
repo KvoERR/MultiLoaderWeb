@@ -143,8 +143,11 @@
                     <button type="button" class="platform-button" id="tg-connect-btn" onclick="tgAuth()">Привязать канал</button>
                 </div>
 
-                <div id="info-vk" class="info-box" style="display: none;">
-                    <button type="button" id="vk-button" class="platform-button" onclick="connectYouTube()">Войти с ВК</button>
+                <div id="info-vk" class="info-box" style="display: none;"> 
+                    <p>
+                        Впишите ID вашей группы в поле: <input type="text" id="channel-name" placeholder="ID" required>
+                    </p>
+                    <button type="button" class="platform-button" id="vk-connect-btn" onclick="vkAuth()">Привязать группу</button>
                 </div>
 
                 <div id="info-zen" class="info-box" style="display: none;">
