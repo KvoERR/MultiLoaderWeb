@@ -10,7 +10,7 @@ class VideoUploader:
         self.upload = VkUpload(self.session)
         self.api = self.session.get_api()
 
-    def upload_video(self, video_path, title, description="", group_id=None):
+    def upload_video(self, video_path, title, privacy_view, description="", group_id=None):
         try:
             print(f"Начинаем загрузку видео: {title}")
             
@@ -29,6 +29,7 @@ class VideoUploader:
                 name=title,
                 description=description,
                 group_id=group_id,
+                privacy_view=privacy_view,
                 wallpost=False,
                 no_comments=False,
                 repeat=True

@@ -155,7 +155,8 @@ def authz():
             'success': True,
             'token': token,
             'yt_auth': yt_auth,
-            'tg_auth': user.tg_chat_id is not None
+            'tg_auth': user.tg_chat_id is not None,
+            'vk_auth': user.vk_group_id is not None
         }), 200
 
     except Exception as e:
@@ -166,6 +167,8 @@ def authz():
 
 @app.route('/process', methods=['POST'])
 def process_form():
+    auth_header = request.headers.get('Authorization')
+    
     if not auth_header or not auth_header.startswith('Bearer '):
         return jsonify({'success': False, 'error': 'Требуется авторизация'}), 401
 
@@ -205,21 +208,21 @@ def process_form():
                 'error': 'Выберите хотя бы одну платформу'
             })
         
-        video_path=get_file_path(video_file)
-        image_path=get_file_path(image_file)
+        video_path = get_file_path(video_file)
+        image_path = get_file_path(image_file)
 
         db = SessionLocal()
-
-        auth_header = request.headers.get('Authorization')
-    
 
         user = db.query(User).filter(User.id == user_id).first()
         if not user:
             return jsonify({'success': False, 'error': 'Пользователь не найден'}), 404
 
-        youtube_result = 'None'
-        vk_result = 'None'
+        youtube_result = None
+        vk_result = None
+
         if 'youtube' in platforms:
+            if 'youtube_creds' not in flask.session:
+                return jsonify({'success': False, 'error': 'YouTube не авторизован'}), 400
             youtube_uploader = YouTube.VideoUploader(flask.session['youtube_creds'])
             youtube_result = youtube_uploader.upload_video(
                 title=title,
@@ -232,6 +235,8 @@ def process_form():
             ) 
         
         if 'vk' in platforms:
+            if 'vk_token' not in flask.session:
+                return jsonify({'success': False, 'error': 'VK не авторизован'}), 400
             vk_uploader = VK.VideoUploader(flask.session['vk_token'])
             vk_result = vk_uploader.upload_video(
                 video_path=video_path,
@@ -260,6 +265,9 @@ def process_form():
             'success': False,
             'error': f'Внутренняя ошибка сервера: {str(e)}'
         })
+    finally:
+        db.close()
+
 
 if __name__ == '__main__':
     init_db()

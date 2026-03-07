@@ -145,9 +145,9 @@
 
                 <div id="info-vk" class="info-box" style="display: none;"> 
                     <p>
-                        Впишите ID вашей группы в поле: <input type="text" id="channel-name" placeholder="ID" required>
+                        Впишите ID вашей группы в поле: <input type="text" id="group-name" placeholder="ID" required>
                     </p>
-                    <button type="button" class="platform-button" id="vk-connect-btn" onclick="vkAuth()">Привязать группу</button>
+                    <button type="button" class="platform-button" id="vk-connect-btn" onclick="vkGroupAuth()">Привязать группу</button>
                 </div>
 
                 <div id="info-zen" class="info-box" style="display: none;">
@@ -204,5 +204,6 @@
     <script src="{{ url_for('static', filename='js/interface/platforms.js') }}"></script>
     <script src="{{ url_for('static', filename='js/interface/auth-popup.js') }}"></script>
     <script type="module" src="{{ url_for('static', filename='js/auth/telegram-auth.js') }}"></script> 
+    <script type="module" src="{{ url_for('static', filename='js/auth/vk-group-auth.js') }}"></script> 
     <script type="module" src="{{ url_for('static', filename='js/auth/auth.js') }}"></script> 
 </html>

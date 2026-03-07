@@ -22,9 +22,10 @@ export function authUpdate(data) {
     if (data.yt_auth) {
         activateButton('youtube');
     }
+    if (data.vk_auth) {
+        activateButton('vk');
+    }
     localStorage.setItem('token', data.token);
-    localStorage.setItem('tg_auth', data.tg_auth);
-    console.log('tg_auth: ' + data.tg_auth);
     closeAuthPopup();
 }
 

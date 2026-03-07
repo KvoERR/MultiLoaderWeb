@@ -1,4 +1,6 @@
 import {activateButton} from './authz.js';
+const channelName = document.getElementById('channel-name');
+const tgAuthBtn = document.getElementById('tg-connect-btn');
 window.tgAuth = async function() {
     if (!channelName.value.trim()) {
         alert('Введите название канала');

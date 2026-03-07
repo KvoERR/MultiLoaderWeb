@@ -113,7 +113,7 @@ def tg_auth():
         db.close()
 
 @auth_bp.route('/auth/vk', methods=['POST'])
-def vk_callback():
+def vk_auth():
     data = request.get_json()
     if not data:
         return jsonify({'error': 'No data provided'}), 400
