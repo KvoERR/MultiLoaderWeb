@@ -12,7 +12,7 @@ from flask_cors import CORS
 from utils import VK, YouTube, Telegram
 from dotenv import load_dotenv
 from auth import auth_bp
-from models import User, init_db, SessionLocal
+from models import User, SessionLocal
 
 
 load_dotenv()
@@ -20,10 +20,7 @@ load_dotenv()
 app = Flask(__name__)
 app.register_blueprint(auth_bp)
 CORS(app)
-app.secret_key = secrets.token_hex(32)
-app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
-app_id = "54311529" #TODO вроде небезопасно
-bot_token=os.getenv('TG_BOT_TOKEN')
+
 
 def get_file_path(file_storage):
     mime_to_text = {
@@ -148,6 +145,7 @@ def authz():
     db = SessionLocal()
     try:
         user = db.query(User).filter(User.id == user_id).first()
+        print(user.tg_chat_id)
         if not user:
             return jsonify({'success': False, 'error': 'Пользователь не найден'}), 404
 
@@ -155,8 +153,8 @@ def authz():
             'success': True,
             'token': token,
             'yt_auth': yt_auth,
-            'tg_auth': user.tg_chat_id is not None,
-            'vk_auth': user.vk_group_id is not None
+            'tg_chat_id': user.tg_chat_id,
+            'vk_group_id': user.vk_group_id
         }), 200
 
     except Exception as e:
@@ -266,9 +264,9 @@ def process_form():
             'error': f'Внутренняя ошибка сервера: {str(e)}'
         })
     finally:
+        if video_path and os.path.exists(video_path):
+            os.remove(video_path)
+
+        if image_path and os.path.exists(image_path):
+            os.remove(image_path)
         db.close()
-
-
-if __name__ == '__main__':
-    init_db()
-    app.run(debug=True, port=80, host='localhost')

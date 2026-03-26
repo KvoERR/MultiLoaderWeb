@@ -1,5 +1,5 @@
 import {activateButton} from './authz.js';
-const channelName = document.getElementById('channel-name');
+const channelName = document.getElementById('tg-channel-name');
 const tgAuthBtn = document.getElementById('tg-connect-btn');
 window.tgAuth = async function() {
     if (!channelName.value.trim()) {

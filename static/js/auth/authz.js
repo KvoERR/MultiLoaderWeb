@@ -16,14 +16,18 @@ export function authUpdate(data) {
         localStorage.removeItem('token');
         location.reload();
     };
-    if (data.tg_auth) {
+    if (data.tg_chat_id) {
+        const channelName = document.getElementById('tg-channel-name');
         activateButton('telegram');
+        //channelName.value = data.tg_chat_id;
     }
     if (data.yt_auth) {
         activateButton('youtube');
     }
-    if (data.vk_auth) {
+    if (data.vk_group_id) {
+        const groupName = document.getElementById('vk-group-name');
         activateButton('vk');
+        groupName.value = data.vk_group_id;
     }
     localStorage.setItem('token', data.token);
     closeAuthPopup();

@@ -5,13 +5,9 @@ import os
 import requests
 from models import User, SessionLocal
 
-# Создаём Blueprint
 auth_bp = Blueprint('auth', __name__)
-
-# Переменные
-
 bot_token = os.getenv('TG_BOT_TOKEN')
-app_id = "54311529"
+app_id = os.getenv('VK_APP_ID')
 SECRET_KEY = os.getenv('SECRET_KEY')
 YOUTUBE_URI = os.getenv('GOOGLE_REDIRECT_URI')
 VK_URI = os.getenv('VK_REDIRECT_URI')

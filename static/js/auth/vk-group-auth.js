@@ -1,5 +1,5 @@
 import {activateButton} from './authz.js';
-const groupName = document.getElementById('group-name');
+const groupName = document.getElementById('vk-group-name');
 const vkAuthBtn = document.getElementById('vk-connect-btn');
 window.vkGroupAuth = async function() {
     if (!groupName.value.trim()) {
