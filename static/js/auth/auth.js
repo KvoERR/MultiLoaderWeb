@@ -1,4 +1,4 @@
-import {authUpdate} from './authz.js';
+import {authUpdate, authz} from './authz.js';
 window.login = async function(e) {
     e.preventDefault();
     const form = e.target;

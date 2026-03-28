@@ -66,6 +66,8 @@ def register():
     username = data.get('username')
     password = data.get('password')
 
+    yt_auth = session.get('yt_auth', False)
+
     if not username or not password:
         return jsonify({'error': 'Логин и пароль обязательны'}), 400
 
@@ -87,10 +89,12 @@ def register():
         }, app.config['SECRET_KEY'], algorithm='HS256')
 
         return jsonify({
+                'success': True,
                 'token': token,
-                'tg_auth': user.tg_chat_id is not None,
-                'yt_auth': user.yt_auth
-        }), 201
+                'yt_auth': yt_auth,
+                'tg_chat_id': user.tg_chat_id,
+                'vk_group_id': user.vk_group_id
+            }), 200
 
     except Exception as e:
         db.rollback()
@@ -104,6 +108,8 @@ def login():
     username = data.get('username')
     password = data.get('password')
 
+    yt_auth = session.get('yt_auth', False)
+
     db = SessionLocal()
     try:
         user = db.query(User).filter(User.username == username).first()
@@ -111,14 +117,16 @@ def login():
             token = jwt.encode({
                 'user_id': user.id,
                 'username': user.username,
-                'exp': datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=24)
+                'exp': datetime.datetime.now(timezone.utc) + datetime.timedelta(hours=24)
             }, app.config['SECRET_KEY'], algorithm='HS256')
             
             return jsonify({
+                'success': True,
                 'token': token,
-                'tg_auth': user.tg_chat_id is not None,
-                'yt_auth': user.yt_auth
-            })
+                'yt_auth': yt_auth,
+                'tg_chat_id': user.tg_chat_id,
+                'vk_group_id': user.vk_group_id
+            }), 200
             
         else:
             return jsonify({'error': 'Неверный логин или пароль'}), 401
@@ -149,7 +157,6 @@ def authz():
     db = SessionLocal()
     try:
         user = db.query(User).filter(User.id == user_id).first()
-        print(user.tg_chat_id)
         if not user:
             return jsonify({'success': False, 'error': 'Пользователь не найден'}), 404
 
