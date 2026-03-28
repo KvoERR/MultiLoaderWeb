@@ -6,6 +6,7 @@ import secrets
 from flask import Blueprint, Flask, render_template, request, jsonify, session, redirect
 import jwt
 import datetime
+from datetime import timezone
 import bcrypt
 import os
 from flask_cors import CORS
@@ -82,7 +83,7 @@ def register():
         token = jwt.encode({
             'user_id': user.id,
             'username': user.username,
-            'exp': datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=24)
+            'exp': datetime.datetime.now(timezone.utc) + datetime.timedelta(hours=24)
         }, app.config['SECRET_KEY'], algorithm='HS256')
 
         return jsonify({
