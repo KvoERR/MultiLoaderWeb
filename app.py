@@ -3,24 +3,27 @@ import hashlib
 import base64
 import flask
 import secrets
-from flask import Flask, render_template, request, jsonify, session, redirect
+from flask import Blueprint, Flask, render_template, request, jsonify, session, redirect
 import jwt
 import datetime
 import bcrypt
 import os
 from flask_cors import CORS
 from utils import VK, YouTube, Telegram
-from dotenv import load_dotenv
-from auth import auth_bp
 from models import User, SessionLocal
-
-
-load_dotenv()
+from dotenv import load_dotenv
 
 app = Flask(__name__)
+auth_bp = Blueprint('auth', __name__)
 app.register_blueprint(auth_bp)
 CORS(app)
 
+load_dotenv()
+app.config['TG_BOT_TOKEN'] = os.getenv('TG_BOT_TOKEN')
+app.config['VK_APP_ID'] = os.getenv('VK_APP_ID')
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+app.config['GOOGLE_REDIRECT_URI'] = os.getenv('GOOGLE_REDIRECT_URI')
+app.config['VK_REDIRECT_URI'] = os.getenv('VK_REDIRECT_URI')
 
 def get_file_path(file_storage):
     mime_to_text = {
@@ -270,3 +273,6 @@ def process_form():
         if image_path and os.path.exists(image_path):
             os.remove(image_path)
         db.close()
+
+if __name__ == '__main__':
+    app.run(debug=True, port=80, host='localhost')
