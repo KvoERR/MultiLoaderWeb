@@ -1,7 +1,8 @@
 export class VKAuth {
+
     constructor(href) {
         this.client_id = '54311529';
-        this.redirect_url = href + '/auth/vk/callback';
+        this.redirect_url = href + 'auth/vk/callback';
         this.APP_NAME = 'MultiLoader';
     }
     generateState() {
@@ -45,16 +46,15 @@ export class VKAuth {
         return verifier;
     }
     async startAuth() {
+        console.log(this.client_id,this.redirect_url,this.APP_NAME)
         const VKID = window.VKIDSDK;
         const codeVerifier = this.generateCodeVerifier();
         const codeChallenge = await this.generateCodeChallenge(codeVerifier);
         const state = this.generateState();
 
-        // Сохраняем временные данные в sessionStorage
         sessionStorage.setItem('vk_state', state);
         sessionStorage.setItem('vk_code_verifier', codeVerifier);
 
-        // Инициализация VK ID SDK
         VKID.Config.init({
             app: this.client_id, //id приложения
             redirectUrl: this.redirect_url, //адрес для редиректа

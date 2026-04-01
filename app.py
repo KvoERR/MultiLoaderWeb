@@ -250,7 +250,7 @@ def process_form():
                 video_path=video_path,
                 title=title,
                 description=description,
-                privacy=privacy,
+                privacy_view=privacy,
                 group_id=user.vk_group_id
             )
 
@@ -258,7 +258,8 @@ def process_form():
             telegram_result = Telegram.upload_video(
                 video_path=video_path,
                 name=title,
-                description=description
+                description=description,
+                chat_id=user.tg_chat_id
             )       
 
         return jsonify({

@@ -1,0 +1,14 @@
+"filename", "language", "Python", "JavaScript", "HTML", "pip requirements", "comment", "blank", "total"
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\app.py", "Python", 17, 0, 0, 0, 0, 2, 19
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\auth.py", "Python", -5, 0, 0, 0, -2, -2, -9
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\passenger_wsgi.py", "Python", 10, 0, 0, 0, 0, 7, 17
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\requirements.txt", "pip requirements", 0, 0, 0, 97, 0, 0, 97
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\js\auth\authz.js", "JavaScript", 0, 4, 0, 0, 0, -1, 3
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\js\auth\form-handler.js", "JavaScript", 0, 24, 0, 0, 1, 1, 26
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\js\auth\telegram-auth.js", "JavaScript", 0, 2, 0, 0, 0, 0, 2
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\js\auth\vk-auth.js", "JavaScript", 0, 2, 0, 0, 0, 0, 2
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\js\auth\vk-group-auth.js", "JavaScript", 0, 40, 0, 0, 0, 5, 45
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\js\auth\youtube-auth.js", "JavaScript", 0, 25, 0, 0, 0, 2, 27
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\templates\base.html", "HTML", 0, 0, 1, 0, 0, 0, 1
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\utils\Telegram.py", "Python", 0, 0, 0, 0, -2, 0, -2
+"Total", "-", 22, 97, 1, 97, -3, 14, 228
