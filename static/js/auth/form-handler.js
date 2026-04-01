@@ -21,18 +21,45 @@ window.submitForm = async function() {
     // Собираем данные формы
     const formData = new FormData(form);
 
+    // Авторизация YouTube (если выбрано)
     if (document.querySelector('input[value="youtube"]:checked')) {
-        connectYouTube();
+        try {
+            await connectYouTube();
+        } catch (err) {
+            showError('Не удалось авторизоваться в YouTube: ' + err.message);
+            button.disabled = false;
+            button.textContent = 'Обработать данные';
+            return;
+        }
     }
 
+    // Авторизация VK (если выбрано)
     if (document.querySelector('input[value="vk"]:checked')) {
-        const vkAuth = new VKAuth();
-        await vkAuth.startAuth();
+        try {
+            const vkAuth = new VKAuth(window.location.href);
+            await vkAuth.startAuth();
+        } catch (err) {
+            showError('Не удалось авторизоваться в VK: ' + err.message);
+            button.disabled = false;
+            button.textContent = 'Обработать данные';
+            return;
+        }
     }
 
-    // Отправляем AJAX запрос во Flask
+    // Проверка токена
+    const token = localStorage.getItem('token');
+    if (!token) {
+        alert('Вы не авторизованы');
+        button.disabled = false;
+        button.textContent = 'Обработать данные';
+        return;
+    }
+
     fetch('/process', {
         method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token}`
+        },
         body: formData
     })
     .then(response => {
@@ -56,7 +83,6 @@ window.submitForm = async function() {
         showError('Ошибка сети: ' + error.message);
     })
     .finally(() => {
-        // Восстанавливаем кнопку
         button.disabled = false;
         button.textContent = 'Обработать данные';
     });

@@ -1,7 +1,9 @@
 export class VKAuth {
-    client_id = '54311529'
-    redirect_url = 'http://localhost:80/auth/vk/callback'
-    APP_NAME = 'MultiLoader'
+    constructor(href) {
+        this.client_id = '54311529';
+        this.redirect_url = href + '/auth/vk/callback';
+        this.APP_NAME = 'MultiLoader';
+    }
     generateState() {
         const array = new Uint8Array(32);
         crypto.getRandomValues(array);

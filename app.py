@@ -2,8 +2,7 @@ import tempfile
 import hashlib
 import base64
 import flask
-import secrets
-from flask import Blueprint, Flask, render_template, request, jsonify, session, redirect
+from flask import Flask, render_template, request, jsonify, session, redirect
 import jwt
 import datetime
 from datetime import timezone
@@ -12,10 +11,10 @@ import os
 from flask_cors import CORS
 from utils import VK, YouTube, Telegram
 from models import User, SessionLocal
+from auth import auth_bp
 from dotenv import load_dotenv
 
 app = Flask(__name__)
-auth_bp = Blueprint('auth', __name__)
 app.register_blueprint(auth_bp)
 CORS(app)
 
@@ -236,8 +235,8 @@ def process_form():
             youtube_result = youtube_uploader.upload_video(
                 title=title,
                 description=description,
-                video=video_path,
-                image=image_path,
+                video_path=video_path,
+                image_path=image_path,
                 tags=tags,
                 privacy=privacy,
                 category=category

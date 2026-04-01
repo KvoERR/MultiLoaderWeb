@@ -1,19 +1,18 @@
-from flask import request, jsonify, session, redirect
+from flask import request, jsonify, session, redirect, current_app, Blueprint
 from google_auth_oauthlib.flow import Flow
 import os
 import requests
 import jwt
 from models import User, SessionLocal
-from app import *
 
-
+auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/auth/youtube/login')
 def youtube_login():
     flow = Flow.from_client_secrets_file(
         'secrets/client_secret_web.json',
         scopes=['https://www.googleapis.com/auth/youtube.upload'],
-        redirect_uri=app.config['GOOGLE_REDIRECT_URI']
+        redirect_uri=current_app.config['GOOGLE_REDIRECT_URI']
     )
     authorization_url, state = flow.authorization_url(
         access_type='offline',
@@ -36,7 +35,7 @@ def youtube_callback():
         flow = Flow.from_client_secrets_file(
             'secrets/client_secret_web.json',
             scopes=['https://www.googleapis.com/auth/youtube.upload'],
-            redirect_uri=app.config['GOOGLE_REDIRECT_URI'],
+            redirect_uri=current_app.config['GOOGLE_REDIRECT_URI'],
             state=state
         )
         flow.fetch_token(code=code)
@@ -69,7 +68,7 @@ def tg_auth():
 
     # Получаем chat_id из Telegram
     try:
-        response = requests.get(f'https://api.telegram.org/bot{app.config['TG_BOT_TOKEN']}/getUpdates').json()
+        response = requests.get(f'https://api.telegram.org/bot{current_app.config['TG_BOT_TOKEN']}/getUpdates').json()
         chat_id = None
         for update in response.get('result', []):
             if 'channel_post' in update and update['channel_post'].get('text') == channel_name:
@@ -85,7 +84,7 @@ def tg_auth():
         return jsonify({'error': 'Authentication required'}), 401
 
     try:
-        payload = jwt.decode(token[7:], app.config['SECRET_KEY'], algorithms=['HS256'])
+        payload = jwt.decode(token[7:], current_app.config['SECRET_KEY'], algorithms=['HS256'])
         user_id = payload['user_id']
     except jwt.InvalidTokenError:
         return jsonify({'error': 'Invalid or expired token'}), 401
@@ -119,7 +118,7 @@ def vk_auth():
         return jsonify({'error': 'Authentication required'}), 401
 
     try:
-        payload = jwt.decode(token[7:], app.config['SECRET_KEY'], algorithms=['HS256'])
+        payload = jwt.decode(token[7:], current_app.config['SECRET_KEY'], algorithms=['HS256'])
         user_id = payload['user_id']
     except jwt.InvalidTokenError:
         return jsonify({'error': 'Invalid or expired token'}), 401
@@ -158,9 +157,9 @@ def vk_callback():
             data={
                 'grant_type': 'authorization_code',
                 'code_verifier': code_verifier,
-                'redirect_uri': app.config['VK_REDIRECT_URI'],
+                'redirect_uri': current_app.config['VK_REDIRECT_URI'],
                 'code': code,
-                'client_id': app.config['VK_APP_ID'],
+                'client_id': current_app.config['VK_APP_ID'],
                 'device_id': device_id,
                 'state': state
             },
