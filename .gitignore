@@ -10,4 +10,5 @@ token.json
 .env
 *.env
 __pycache__
+materials/
 *.pyc

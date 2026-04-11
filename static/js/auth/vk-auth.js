@@ -87,7 +87,7 @@ export class VKAuth {
             sessionStorage.removeItem('vk_code_verifier');
 
             // Передаём все необходимые данные на бэкенд
-            const response = await fetch('/auth/vk/callback', {
+            const response = await fetch('/auth/vk/callback', { //тут возможно проблемы
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

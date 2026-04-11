@@ -68,7 +68,7 @@ def tg_auth():
 
     # Получаем chat_id из Telegram
     try:
-        response = requests.get(f'https://api.telegram.org/bot{current_app.config['TG_BOT_TOKEN']}/getUpdates').json()
+        response = requests.get(f"https://api.telegram.org/bot{current_app.config['TG_BOT_TOKEN']}/getUpdates").json()
         chat_id = None
         for update in response.get('result', []):
             if 'channel_post' in update and update['channel_post'].get('text') == channel_name:

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/icons/favicon.ico">
     <title>{% block title %}MultiLoader{% endblock %}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
@@ -203,6 +204,7 @@
     <script src="{{ url_for('static', filename='js/interface/file-explorer.js') }}"></script>
     <script src="{{ url_for('static', filename='js/interface/platforms.js') }}"></script>
     <script src="{{ url_for('static', filename='js/interface/auth-popup.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/interface/auto-tag.js') }}"></script>
     <script type="module" src="{{ url_for('static', filename='js/auth/telegram-auth.js') }}"></script> 
     <script type="module" src="{{ url_for('static', filename='js/auth/vk-group-auth.js') }}"></script> 
     <script type="module" src="{{ url_for('static', filename='js/auth/auth.js') }}"></script> 
