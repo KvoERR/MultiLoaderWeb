@@ -9,10 +9,18 @@ auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/auth/youtube/login')
 def youtube_login():
-    flow = Flow.from_client_secrets_file(
-        'secrets/client_secret_web.json',
-        scopes=['https://www.googleapis.com/auth/youtube.upload'],
-        redirect_uri=current_app.config['GOOGLE_REDIRECT_URI']
+    flow = Flow.from_client_config(
+        {
+            "web": {
+                "client_id": current_app.config["GOOGLE_CLIENT_ID"],
+                "client_secret": current_app.config["GOOGLE_CLIENT_SECRET"],
+                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                "token_uri": "https://oauth2.googleapis.com/token",
+                "redirect_uris": [current_app.config["GOOGLE_REDIRECT_URI"],]
+            }
+        },
+        scopes=["https://www.googleapis.com/auth/youtube.upload"],
+        redirect_uri=current_app.config["GOOGLE_REDIRECT_URI"],
     )
     authorization_url, state = flow.authorization_url(
         access_type='offline',
@@ -32,10 +40,18 @@ def youtube_callback():
         return jsonify({'error': 'Authorization code not found'}), 400
 
     try:
-        flow = Flow.from_client_secrets_file(
-            'secrets/client_secret_web.json',
-            scopes=['https://www.googleapis.com/auth/youtube.upload'],
-            redirect_uri=current_app.config['GOOGLE_REDIRECT_URI'],
+        flow = Flow.from_client_config(
+            {
+                "web": {
+                    "client_id": current_app.config["GOOGLE_CLIENT_ID"],
+                    "client_secret": current_app.config["GOOGLE_CLIENT_SECRET"],
+                    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+                    "token_uri": "https://oauth2.googleapis.com/token",
+                    "redirect_uris": [current_app.config["GOOGLE_REDIRECT_URI"],]
+                }
+            },
+            scopes=["https://www.googleapis.com/auth/youtube.upload"],
+            redirect_uri=current_app.config["GOOGLE_REDIRECT_URI"],
             state=state
         )
         flow.fetch_token(code=code)
