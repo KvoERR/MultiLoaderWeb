@@ -1,5 +1,8 @@
 from flask import request, jsonify, session, redirect, current_app, Blueprint
 from google_auth_oauthlib.flow import Flow
+import hashlib
+import base64
+import secrets
 import os
 import requests
 import jwt
@@ -9,6 +12,9 @@ auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/auth/youtube/login')
 def youtube_login():
+    code_verifier = secrets.token_urlsafe(64)
+    session['code_verifier'] = code_verifier  # ← сохраняем в сессии
+
     flow = Flow.from_client_config(
         {
             "web": {
@@ -16,15 +22,23 @@ def youtube_login():
                 "client_secret": current_app.config["GOOGLE_CLIENT_SECRET"],
                 "auth_uri": "https://accounts.google.com/o/oauth2/auth",
                 "token_uri": "https://oauth2.googleapis.com/token",
-                "redirect_uris": [current_app.config["GOOGLE_REDIRECT_URI"],]
+                "redirect_uris": [current_app.config["GOOGLE_REDIRECT_URI"]]
             }
         },
         scopes=["https://www.googleapis.com/auth/youtube.upload"],
         redirect_uri=current_app.config["GOOGLE_REDIRECT_URI"],
     )
+
+    # Создаём code_challenge из code_verifier
+    import hashlib
+    code_challenge = hashlib.sha256(code_verifier.encode('utf-8')).digest()
+    code_challenge = base64.urlsafe_b64encode(code_challenge).decode('utf-8').strip('=')
+
     authorization_url, state = flow.authorization_url(
         access_type='offline',
-        prompt='consent'
+        prompt='consent',
+        code_challenge=code_challenge,
+        code_challenge_method='S256'
     )
     session['oauth_state'] = state
     return redirect(authorization_url)
@@ -39,6 +53,10 @@ def youtube_callback():
     if not code:
         return jsonify({'error': 'Authorization code not found'}), 400
 
+    code_verifier = session.get('code_verifier')
+    if not code_verifier:
+        return jsonify({'error': 'Missing code verifier in session'}), 400
+
     try:
         flow = Flow.from_client_config(
             {
@@ -47,14 +65,16 @@ def youtube_callback():
                     "client_secret": current_app.config["GOOGLE_CLIENT_SECRET"],
                     "auth_uri": "https://accounts.google.com/o/oauth2/auth",
                     "token_uri": "https://oauth2.googleapis.com/token",
-                    "redirect_uris": [current_app.config["GOOGLE_REDIRECT_URI"],]
+                    "redirect_uris": [current_app.config["GOOGLE_REDIRECT_URI"]]
                 }
             },
             scopes=["https://www.googleapis.com/auth/youtube.upload"],
             redirect_uri=current_app.config["GOOGLE_REDIRECT_URI"],
             state=state
         )
-        flow.fetch_token(code=code)
+
+        flow.fetch_token(code=code, code_verifier=code_verifier)
+
         creds = flow.credentials
 
         session['youtube_creds'] = {
@@ -65,7 +85,10 @@ def youtube_callback():
             'client_secret': creds.client_secret,
             'scopes': creds.scopes
         }
-        session['yt_auth']=True
+        session['yt_auth'] = True
+
+        session.pop('code_verifier', None)
+
         return redirect('/')
     except Exception as e:
         print(f"Ошибка авторизации YouTube: {e}")

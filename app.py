@@ -1,6 +1,4 @@
 import tempfile
-import hashlib
-import base64
 import flask
 from flask import Flask, render_template, request, jsonify, session, redirect
 import jwt
@@ -43,13 +41,6 @@ def get_file_path(file_storage):
     with tempfile.NamedTemporaryFile(delete=False, suffix=extension) as temp_file:
         file_storage.save(temp_file.name)
         return temp_file.name
-
-def generate_code_challenge(verifier):
-    # SHA-256 хеширование
-    sha256_hash = hashlib.sha256(verifier.encode('utf-8')).digest()
-    # Base64url кодирование
-    challenge = base64.urlsafe_b64encode(sha256_hash).rstrip(b'=')
-    return challenge.decode('utf-8')
 
 def hash_password(password):
     return bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
