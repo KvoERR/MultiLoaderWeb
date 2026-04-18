@@ -46,7 +46,6 @@ export class VKAuth {
         return verifier;
     }
     async startAuth() {
-        console.log(this.client_id,this.redirect_url,this.APP_NAME)
         const VKID = window.VKIDSDK;
         const codeVerifier = this.generateCodeVerifier();
         const codeChallenge = await this.generateCodeChallenge(codeVerifier);
@@ -66,7 +65,6 @@ export class VKAuth {
 
         // Открываем окно авторизации
         const result = await VKID.Auth.login();
-        console.log(result)
         if (result.code != '102')
         {
             const returnedState = result.state;

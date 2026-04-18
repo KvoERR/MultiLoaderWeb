@@ -21,9 +21,6 @@ export function authUpdate(data) {
         activateButton('telegram');
         //channelName.value = data.tg_chat_id;
     }
-    if (data.yt_auth) {
-        activateButton('youtube');
-    }
     if (data.vk_group_id) {
         const groupName = document.getElementById('vk-group-name');
         activateButton('vk');

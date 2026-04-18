@@ -99,8 +99,8 @@
                             <input type="checkbox" name="platforms" value="youtube"> 
                             YouTube
                         </label>
-                        <button type="button" id="youtube-button" class="platform-button" onclick="toggleInfo('youtube')">Привязать</button>
- 
+                        <div></div>
+                        
                         <label>
                             <input type="checkbox" name="platforms" value="telegram"> 
                             Telegram
@@ -195,7 +195,7 @@
     </footer>
 
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <script src="https://unpkg.com/@vkid/sdk@<2.6.1/dist-sdk/umd/index.js"></script>
+    <script src="https://unpkg.com/@vkid/sdk@2.6.1/dist-sdk/umd/index.js"></script>
     <script type="module" src="{{ url_for('static', filename='js/auth/form-handler.js') }}"></script>
     <script src="{{ url_for('static', filename='js/interface/file-explorer.js') }}"></script>
     <script src="{{ url_for('static', filename='js/interface/platforms.js') }}"></script>

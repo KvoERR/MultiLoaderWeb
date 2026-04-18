@@ -245,7 +245,7 @@ def process_form():
                 description=description,
                 privacy_view=privacy,
                 group_id=user.vk_group_id
-            )
+            ).ok
 
         if 'telegram' in platforms:
             telegram_result = Telegram.upload_video(
@@ -253,12 +253,13 @@ def process_form():
                 name=title,
                 description=description,
                 chat_id=user.tg_chat_id
-            )       
+            ).success
 
         return jsonify({
             'success': True,
             'youtube_result': youtube_result,
             'vk_result': vk_result,
+            'telegram_result': telegram_result,
             'message': 'Данные успешно получены и обработаны'
         }) 
     except Exception as e:
