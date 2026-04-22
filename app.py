@@ -253,7 +253,7 @@ def process_form():
                 name=title,
                 description=description,
                 chat_id=user.tg_chat_id
-            ).success
+            )
 
         return jsonify({
             'success': True,
