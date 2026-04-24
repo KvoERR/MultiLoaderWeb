@@ -1,4 +1,5 @@
 import {authUpdate, authz} from './authz.js';
+import { closeAuthPopup } from './auth-popup.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     authz();
@@ -20,6 +21,7 @@ window.login = async function(e) {
     const data = await response.json();
 
     if (response.ok) {
+        closeAuthPopup();
         authUpdate(data);
     } else {
         alert('Ошибка: ' + data.error);

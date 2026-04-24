@@ -1,5 +1,3 @@
-import { closeAuthPopup } from './auth-popup.js';
-
 export function activateButton(platform) {
     const button = document.getElementById(`${platform}-button`);
     button.style.backgroundColor = 'green';
@@ -26,7 +24,7 @@ export function authUpdate(data) {
         groupName.value = data.vk_group_id;
     }
     localStorage.setItem('token', data.token);
-    closeAuthPopup();
+    
 }
 
 export async function authz() {
