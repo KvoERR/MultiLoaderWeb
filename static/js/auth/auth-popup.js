@@ -4,44 +4,37 @@ const registerForm = document.getElementById('registerForm');
 const loginTabBtn = document.getElementById('loginTabBtn');
 const registerTabBtn = document.getElementById('registerTabBtn');
 const authBtn = document.getElementById('auth-btn');
-const tgInfoBtn = document.getElementById('tg-info-btn');
-const tgAuthBtn = document.getElementById('tg-connect-btn');
-const channelName = document.getElementById('channel-name');
+const closeBtn = document.querySelector('.close-btn');
 
-// Открыть попап и переключиться на нужную вкладку
-function openAuthPopup(tab = 'login') {
+export function openAuthPopup(tab = 'login') {
+    if (!authPopup) return;
     authPopup.style.display = 'flex';
     switchAuthTab(tab);
-    document.body.style.overflow = 'hidden'; // Запрет прокрутки
+    document.body.style.overflow = 'hidden';
 }
 
-// Закрыть попап
 export function closeAuthPopup() {
+    if (!authPopup) return;
     authPopup.style.display = 'none';
-    document.body.style.overflow = ''; // Разрешить прокрутку
+    document.body.style.overflow = '';
 }
 
-// Переключение между вкладками: Вход / Регистрация
 export function switchAuthTab(tab) {
-    loginForm.style.display = tab === 'login' ? 'flex' : 'none';
-    registerForm.style.display = tab === 'register' ? 'flex' : 'none';
+    if (loginForm) loginForm.style.display = tab === 'login' ? 'flex' : 'none';
+    if (registerForm) registerForm.style.display = tab === 'register' ? 'flex' : 'none';
 
-    loginTabBtn.classList.toggle('active', tab === 'login');
-    registerTabBtn.classList.toggle('active', tab === 'register');
+    if (loginTabBtn) loginTabBtn.classList.toggle('active', tab === 'login');
+    if (registerTabBtn) registerTabBtn.classList.toggle('active', tab === 'register');
 }
 
-// Закрытие попапа по клику на подложку
-authPopup.addEventListener('click', function(e) {
-    if (e.target === authPopup) {
-        closeAuthPopup();
-    }
-});
-
-// Закрытие по клавише Esc
+// Вешаем обработчики после загрузки DOM
 document.addEventListener('DOMContentLoaded', () => {
-    // Кнопка открытия попапа
     if (authBtn) {
         authBtn.addEventListener('click', () => openAuthPopup('login'));
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', closeAuthPopup);
     }
 
     if (authPopup) {
@@ -50,7 +43,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Закрытие по Esc
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && authPopup?.style.display === 'flex') {
             closeAuthPopup();
