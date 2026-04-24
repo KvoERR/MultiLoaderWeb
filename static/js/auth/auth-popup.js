@@ -9,7 +9,7 @@ const tgAuthBtn = document.getElementById('tg-connect-btn');
 const channelName = document.getElementById('channel-name');
 
 // Открыть попап и переключиться на нужную вкладку
-export function openAuthPopup(tab = 'login') {
+function openAuthPopup(tab = 'login') {
     authPopup.style.display = 'flex';
     switchAuthTab(tab);
     document.body.style.overflow = 'hidden'; // Запрет прокрутки
@@ -38,8 +38,22 @@ authPopup.addEventListener('click', function(e) {
 });
 
 // Закрытие по клавише Esc
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && authPopup.style.display === 'flex') {
-        closeAuthPopup();
+document.addEventListener('DOMContentLoaded', () => {
+    // Кнопка открытия попапа
+    if (authBtn) {
+        authBtn.addEventListener('click', () => openAuthPopup('login'));
     }
+
+    if (authPopup) {
+        authPopup.addEventListener('click', (e) => {
+            if (e.target === authPopup) closeAuthPopup();
+        });
+    }
+
+    // Закрытие по Esc
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && authPopup?.style.display === 'flex') {
+            closeAuthPopup();
+        }
+    });
 });

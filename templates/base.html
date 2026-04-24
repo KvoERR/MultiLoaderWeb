@@ -162,7 +162,7 @@
             </div>
         </form>
         <div id="result" class="result"></div>
-        <button id="auth-btn" onclick="openAuthPopup()">
+        <button id="auth-btn">
             ℹ️
         </button>
 
@@ -198,8 +198,9 @@
     <script src="https://unpkg.com/@vkid/sdk@2.6.1/dist-sdk/umd/index.js"></script>
     <script type="module" src="{{ url_for('static', filename='js/auth/form-handler.js') }}"></script>
     <script src="{{ url_for('static', filename='js/interface/file-explorer.js') }}"></script>
-    <script src="{{ url_for('static', filename='js/interface/platforms.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/interface/platforms.js') }}"></script> 
     <script src="{{ url_for('static', filename='js/interface/auto-tag.js') }}"></script>
+    <script type="module" src="{{ url_for('static', filename='js/auth/auth-popup.js') }}"></script>
     <script type="module" src="{{ url_for('static', filename='js/auth/telegram-auth.js') }}"></script> 
     <script type="module" src="{{ url_for('static', filename='js/auth/vk-group-auth.js') }}"></script> 
     <script type="module" src="{{ url_for('static', filename='js/auth/auth.js') }}"></script> 
