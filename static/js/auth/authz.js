@@ -1,6 +1,4 @@
-document.addEventListener('DOMContentLoaded', function () {
-    authz();
-});
+import { closeAuthPopup } from './auth-popup.js';
 
 export function activateButton(platform) {
     const button = document.getElementById(`${platform}-button`);

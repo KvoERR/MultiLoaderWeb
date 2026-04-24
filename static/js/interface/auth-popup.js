@@ -9,20 +9,20 @@ const tgAuthBtn = document.getElementById('tg-connect-btn');
 const channelName = document.getElementById('channel-name');
 
 // Открыть попап и переключиться на нужную вкладку
-function openAuthPopup(tab = 'login') {
+export function openAuthPopup(tab = 'login') {
     authPopup.style.display = 'flex';
     switchAuthTab(tab);
     document.body.style.overflow = 'hidden'; // Запрет прокрутки
 }
 
 // Закрыть попап
-function closeAuthPopup() {
+export function closeAuthPopup() {
     authPopup.style.display = 'none';
     document.body.style.overflow = ''; // Разрешить прокрутку
 }
 
 // Переключение между вкладками: Вход / Регистрация
-function switchAuthTab(tab) {
+export function switchAuthTab(tab) {
     loginForm.style.display = tab === 'login' ? 'flex' : 'none';
     registerForm.style.display = tab === 'register' ? 'flex' : 'none';
 

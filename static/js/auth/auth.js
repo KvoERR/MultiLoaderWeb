@@ -1,4 +1,9 @@
 import {authUpdate, authz} from './authz.js';
+
+document.addEventListener('DOMContentLoaded', () => {
+    authz();
+});
+
 window.login = async function(e) {
     e.preventDefault();
     const form = e.target;
