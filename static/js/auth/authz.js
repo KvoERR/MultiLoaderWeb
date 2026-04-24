@@ -10,6 +10,7 @@ export function activateButton(platform) {
 }
 
 export function authUpdate(data) {
+    const authBtn = document.getElementById('auth-btn');
     authBtn.textContent = '👤';
     authBtn.title = 'Выйти';
     authBtn.onclick = function() {
