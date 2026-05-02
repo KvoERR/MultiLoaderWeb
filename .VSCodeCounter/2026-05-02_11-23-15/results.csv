@@ -1,0 +1,29 @@
+"filename", "language", "Python", "JavaScript", "HTML", "PostCSS", "pip requirements", "comment", "blank", "total"
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\app.py", "Python", 237, 0, 0, 0, 0, 0, 43, 280
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\auth.py", "Python", 180, 0, 0, 0, 0, 2, 33, 215
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\models.py", "Python", 19, 0, 0, 0, 0, 0, 7, 26
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\passenger_wsgi.py", "Python", 10, 0, 0, 0, 0, 0, 7, 17
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\requirements.txt", "pip requirements", 0, 0, 0, 0, 97, 0, 0, 97
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\css\auth.css", "PostCSS", 0, 0, 0, 113, 0, 7, 15, 135
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\css\file.css", "PostCSS", 0, 0, 0, 52, 0, 0, 10, 62
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\css\form.css", "PostCSS", 0, 0, 0, 40, 0, 0, 5, 45
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\css\platforms.css", "PostCSS", 0, 0, 0, 48, 0, 0, 15, 63
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\css\publicity.css", "PostCSS", 0, 0, 0, 25, 0, 0, 6, 31
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\css\style.css", "PostCSS", 0, 0, 0, 11, 0, 0, 1, 12
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\js\auth\auth-popup.js", "JavaScript", 0, 54, 0, 0, 0, 1, 10, 65
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\js\auth\auth.js", "JavaScript", 0, 47, 0, 0, 0, 0, 10, 57
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\js\auth\authz.js", "JavaScript", 0, 52, 0, 0, 0, 1, 7, 60
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\js\auth\form-handler.js", "JavaScript", 0, 94, 0, 0, 0, 10, 17, 121
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\js\auth\telegram-auth.js", "JavaScript", 0, 40, 0, 0, 0, 0, 5, 45
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\js\auth\vk-auth.js", "JavaScript", 0, 98, 0, 0, 0, 4, 14, 116
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\js\auth\vk-group-auth.js", "JavaScript", 0, 40, 0, 0, 0, 0, 5, 45
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\js\auth\youtube-auth.js", "JavaScript", 0, 31, 0, 0, 0, 1, 5, 37
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\js\interface\auto-tag.js", "JavaScript", 0, 4, 0, 0, 0, 0, 1, 5
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\js\interface\file-explorer.js", "JavaScript", 0, 99, 0, 0, 0, 12, 22, 133
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\js\interface\platforms.js", "JavaScript", 0, 25, 0, 0, 0, 0, 7, 32
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\static\js\interface\tag-request.js", "JavaScript", 0, 5, 0, 0, 0, 0, 3, 8
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\templates\base.html", "HTML", 0, 0, 182, 0, 0, 0, 25, 207
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\utils\Telegram.py", "Python", 58, 0, 0, 0, 0, 0, 13, 71
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\utils\VK.py", "Python", 36, 0, 0, 0, 0, 4, 10, 50
+"c:\Users\kostyan\Yandex.Disk\MultiLoaderWeb\MultiLoader\utils\YouTube.py", "Python", 73, 0, 0, 0, 0, 0, 9, 82
+"Total", "-", 613, 589, 182, 289, 97, 42, 305, 2117
