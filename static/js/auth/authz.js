@@ -1,3 +1,4 @@
+
 export function activateButton(platform) {
     const button = document.getElementById(`${platform}-button`);
     button.style.backgroundColor = 'green';

@@ -43,6 +43,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    if (registerTabBtn) {
+        registerTabBtn.addEventListener('click', () => {
+            switchAuthTab('register');
+        });
+    } else {
+        console.error("Кнопка #registerTabBtn не найдена");
+    }
+
+    if (loginTabBtn) {
+        loginTabBtn.addEventListener('click', () => {
+            switchAuthTab('login');
+        });
+    }
+
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && authPopup?.style.display === 'flex') {
             closeAuthPopup();
