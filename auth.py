@@ -7,45 +7,27 @@ import os
 import requests
 import jwt
 from models import User, SessionLocal
+from Platform import Platform, YouTube, VK
 
 auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/auth/youtube/login')
 def youtube_login():
-    code_verifier = secrets.token_urlsafe(64)
-    session['code_verifier'] = code_verifier  # ← сохраняем в сессии
+    code_verifier = Platform.generate_code_verifier()
+    session['youtube_code_verifier'] = code_verifier
 
-    flow = Flow.from_client_config(
-        {
-            "web": {
-                "client_id": current_app.config["GOOGLE_CLIENT_ID"],
-                "client_secret": current_app.config["GOOGLE_CLIENT_SECRET"],
-                "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                "token_uri": "https://oauth2.googleapis.com/token",
-                "redirect_uris": [current_app.config["GOOGLE_REDIRECT_URI"]]
-            }
-        },
-        scopes=["https://www.googleapis.com/auth/youtube.upload"],
-        redirect_uri=current_app.config["GOOGLE_REDIRECT_URI"],
-    )
-
-    # Создаём code_challenge из code_verifier
-    import hashlib
-    code_challenge = hashlib.sha256(code_verifier.encode('utf-8')).digest()
-    code_challenge = base64.urlsafe_b64encode(code_challenge).decode('utf-8').strip('=')
-
-    authorization_url, state = flow.authorization_url(
-        access_type='offline',
-        prompt='consent',
-        code_challenge=code_challenge,
-        code_challenge_method='S256'
-    )
-    session['oauth_state'] = state
+    youtube = YouTube(code_verifier,
+                      current_app.config["GOOGLE_CLIENT_ID"],
+                      current_app.config["GOOGLE_CLIENT_SECRET"],
+                      current_app.config["GOOGLE_REDIRECT_URI"])
+    authorization_url, state = youtube.get_authorization_url()
+    session['youtube_state']=state
     return redirect(authorization_url)
 
 @auth_bp.route('/auth/youtube/callback')
 def youtube_callback():
-    state = session.get('oauth_state')
+    # Проверяем state, который вернули
+    state = session.get('youtube_state')
     if not state or state != request.args.get('state'):
         return jsonify({'error': 'Invalid state'}), 400
 
@@ -53,46 +35,29 @@ def youtube_callback():
     if not code:
         return jsonify({'error': 'Authorization code not found'}), 400
 
-    code_verifier = session.get('code_verifier')
+    code_verifier = session.get('youtube_code_verifier')
     if not code_verifier:
         return jsonify({'error': 'Missing code verifier in session'}), 400
 
-    try:
-        flow = Flow.from_client_config(
-            {
-                "web": {
-                    "client_id": current_app.config["GOOGLE_CLIENT_ID"],
-                    "client_secret": current_app.config["GOOGLE_CLIENT_SECRET"],
-                    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-                    "token_uri": "https://oauth2.googleapis.com/token",
-                    "redirect_uris": [current_app.config["GOOGLE_REDIRECT_URI"]]
-                }
-            },
-            scopes=["https://www.googleapis.com/auth/youtube.upload"],
-            redirect_uri=current_app.config["GOOGLE_REDIRECT_URI"],
-            state=state
-        )
+    youtube = YouTube(code_verifier,
+                      current_app.config["GOOGLE_CLIENT_ID"],
+                      current_app.config["GOOGLE_CLIENT_SECRET"],
+                      current_app.config["GOOGLE_REDIRECT_URI"])
+    creds = youtube.get_creds(code)
 
-        flow.fetch_token(code=code, code_verifier=code_verifier)
+    # TODO проверить безопасность
+    session['youtube_creds'] = {
+        'token': creds.token,
+        'refresh_token': creds.refresh_token,
+        'token_uri': creds.token_uri,
+        'client_id': creds.client_id,
+        'client_secret': creds.client_secret,
+        'scopes': creds.scopes
+    }
+    session['yt_auth'] = True
+    session.pop('youtube_code_verifier', None)
 
-        creds = flow.credentials
-
-        session['youtube_creds'] = {
-            'token': creds.token,
-            'refresh_token': creds.refresh_token,
-            'token_uri': creds.token_uri,
-            'client_id': creds.client_id,
-            'client_secret': creds.client_secret,
-            'scopes': creds.scopes
-        }
-        session['yt_auth'] = True
-
-        session.pop('code_verifier', None)
-
-        return redirect('/')
-    except Exception as e:
-        print(f"Ошибка авторизации YouTube: {e}")
-        return jsonify({'error': str(e)}), 500
+    return redirect('/')
 
 
 @auth_bp.route('/auth/tg', methods=['POST'])
@@ -210,5 +175,7 @@ def vk_callback():
     except Exception as e:
         print(f"Ошибка в /auth/vk/callback: {e}")
         return jsonify({'error': 'Internal server error'}), 500
+
+
 
 __all__ = ['auth_bp']

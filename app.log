@@ -1,0 +1,21 @@
+2026-07-20 12:41:44,211 - WARNING -  * Debugger is active!
+2026-07-20 12:41:44,228 - INFO -  * Debugger PIN: 536-365-297
+2026-07-20 12:41:59,259 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://localhost:80
+2026-07-20 12:41:59,260 - INFO - [33mPress CTRL+C to quit[0m
+2026-07-20 12:41:59,263 - INFO -  * Restarting with stat
+2026-07-20 12:42:00,701 - WARNING -  * Debugger is active!
+2026-07-20 12:42:00,714 - INFO -  * Debugger PIN: 536-365-297
+2026-07-20 12:42:04,636 - INFO - 127.0.0.1 - - [20/Jul/2026 12:42:04] "[32mGET /auth/youtube/login HTTP/1.1[0m" 302 -
+2026-07-20 12:42:14,344 - INFO - 127.0.0.1 - - [20/Jul/2026 12:42:14] "[32mGET /auth/youtube/callback?state=uNXDdQq4yTSzYiEIQc4LJG7qkwBXIT&iss=https://accounts.google.com&code=4/0AXEQxIB5kAxNe-Z9miavqwLCV1urxVVTNxIKHfErKe_AWcsK5AEFLUT5iyKwz6gAKusymw&scope=https://www.googleapis.com/auth/youtube.upload HTTP/1.1[0m" 302 -
+2026-07-20 12:42:14,382 - INFO - 127.0.0.1 - - [20/Jul/2026 12:42:14] "GET / HTTP/1.1" 200 -
+2026-07-20 12:42:15,192 - INFO - 127.0.0.1 - - [20/Jul/2026 12:42:15] "GET /static/css/auth.css HTTP/1.1" 200 -
+2026-07-20 12:42:15,202 - INFO - 127.0.0.1 - - [20/Jul/2026 12:42:15] "GET /static/css/platforms.css HTTP/1.1" 200 -
+2026-07-20 12:42:15,255 - INFO - 127.0.0.1 - - [20/Jul/2026 12:42:15] "GET /static/css/form.css HTTP/1.1" 200 -
+2026-07-20 12:42:15,257 - INFO - 127.0.0.1 - - [20/Jul/2026 12:42:15] "GET /static/css/publicity.css HTTP/1.1" 200 -
+2026-07-20 12:42:15,259 - INFO - 127.0.0.1 - - [20/Jul/2026 12:42:15] "GET /static/css/style.css HTTP/1.1" 200 -
+2026-07-20 12:42:15,277 - INFO - 127.0.0.1 - - [20/Jul/2026 12:42:15] "GET /static/css/file.css HTTP/1.1" 200 -
+2026-07-20 12:42:15,444 - INFO - Uploading: 123
+2026-07-20 12:42:15,449 - INFO - file_cache is only supported with oauth2client<4.0.0
+2026-07-20 12:44:12,972 - INFO -  * Detected change in 'c:\\Users\\kostyan\\Yandex.Disk\\MultiLoaderWeb\\MultiLoader\\Uploader.py', reloading
+2026-07-20 12:44:13,314 - INFO -  * Restarting with stat
