@@ -221,30 +221,97 @@ class VKUploader(Uploader):
     def upload_video(self):
         try:
             if not os.path.exists(self.video_path):
-                return {'success': False, 'error': 'File not found'}
+                return {'success': False, 'error': f'File not found: {self.video_path}'}
 
+            # 🔥 ПРАВИЛЬНЫЙ privacy для VK
+            privacy_map = {
+                'public': '0',      # Все видят
+                'private': '1',     # Только я
+                'friends': '2',     # Только друзья
+                'group': '3'        # Только участники группы
+            }
+            
+            # Получаем ID группы (без знака минус)
+            group_id = self.group_id
+            if group_id and str(group_id).startswith('-'):
+                group_id = str(group_id)[1:]  # Убираем минус
+            
+            # 🔥 ПРАВИЛЬНЫЙ ВЫЗОВ video.save
             video_info = self.api.video.save(
-                name=self.title,
-                description=self.description,
-                group_id=self.group_id,
-                privacy_view=self.privacy,
-                wallpost=False,
-                no_comments=False,
-                repeat=True
+                name=self.title[:200],  # Ограничение VK
+                description=self.description[:1000] if self.description else '',
+                group_id=int(group_id) if group_id else None,
+                privacy_view=privacy_map.get(self.privacy, '0'),
+                wallpost=0,
+                no_comments=0,
+                repeat=1
             )
-
+            
+            upload_url = video_info['upload_url']
+            video_id = video_info.get('video_id')
+            owner_id = video_info.get('owner_id')
+            
+            # 🔥 ЗАГРУЗКА ВИДЕО
             with open(self.video_path, 'rb') as f:
-                response = requests.post(video_info['upload_url'], files={'video_file': f})
-
+                response = requests.post(
+                    upload_url,
+                    files={'video_file': f},
+                    timeout=300  # 5 минут на загрузку
+                )
+            
             if response.status_code == 200:
-                result = response.json()
+                try:
+                    result = response.json()
+                    
+                    # Проверяем, что видео загружено
+                    # VK возвращает разные форматы ответа
+                    if 'video_id' in result:
+                        video_id = result.get('video_id', video_id)
+                        owner_id = result.get('owner_id', owner_id)
+                    elif 'id' in result:
+                        video_id = result.get('id', video_id)
+                        owner_id = result.get('owner_id', owner_id)
+                    
+                    # Формируем ссылку на видео
+                    video_url = f"https://vk.com/video{owner_id}_{video_id}"
+                    if self.group_id:
+                        video_url = f"https://vk.com/video-{group_id}_{video_id}"
+                    
+                    return {
+                        'success': True,
+                        'video_id': video_id,
+                        'owner_id': owner_id,
+                        'url': video_url,
+                        'message': 'Video uploaded successfully'
+                    }
+                except Exception as e:
+                    return {
+                        'success': False,
+                        'error': f'Failed to parse VK response: {str(e)}'
+                    }
+            else:
                 return {
-                    'success': True,
-                    'video_id': result.get('video_id', video_info.get('video_id')),
-                    'message': 'Video uploaded successfully'
+                    'success': False,
+                    'error': f'Upload failed with status {response.status_code}: {response.text}'
                 }
-
-            return {'success': False, 'error': f'Upload failed: {response.status_code}'}
-
+                
+        except vk_api.exceptions.ApiError as e:
+            error_msg = str(e)
+            
+            # Детальная обработка ошибок VK
+            if 'video already exists' in error_msg.lower():
+                return {'success': False, 'error': 'Видео с таким названием уже существует'}
+            elif 'access denied' in error_msg.lower():
+                return {'success': False, 'error': 'Нет доступа к группе. Проверьте права токена'}
+            elif 'group id' in error_msg.lower():
+                return {'success': False, 'error': f'Неверный ID группы: {self.group_id}'}
+            else:
+                return {'success': False, 'error': f'VK API error: {error_msg}'}
+                
+        except requests.exceptions.RequestException as e:
+            return {'success': False, 'error': f'Network error: {str(e)}'}
+            
         except Exception as e:
+            import traceback
+            traceback.print_exc()
             return {'success': False, 'error': str(e)}

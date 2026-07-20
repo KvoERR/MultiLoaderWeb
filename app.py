@@ -7,7 +7,7 @@ from datetime import timezone
 import bcrypt
 import os
 from flask_cors import CORS
-from utils import VK, YouTube, Telegram
+from utils import Telegram
 from Uploader import YouTubeUploader, VKUploader
 from models import User, SessionLocal
 from auth import auth_bp
@@ -233,10 +233,6 @@ def process_form():
         video_path = get_file_path(video_file)
         image_path = get_file_path(image_file) if image_file else None
 
-        print(f"🔍 Video file size: {os.path.getsize(video_path) / (1024*1024):.2f} MB")
-        if image_path:
-            print(f"🔍 Image file size: {os.path.getsize(image_path) / (1024*1024):.2f} MB")
-
         db = SessionLocal()
         user = db.query(User).filter(User.id == user_id).first()
         if not user:
@@ -246,16 +242,10 @@ def process_form():
         vk_result = None
         telegram_result = None
 
-        # Загрузка на YouTube
         if 'youtube' in platforms:
             if 'youtube_creds' not in session:
                 return jsonify({'success': False, 'error': 'YouTube не авторизован'}), 400
             try:
-                creds = session['youtube_creds']
-                print(f"🔍 YouTube creds check:")
-                print(f"   token: {creds.get('token', 'MISSING')[:30]}...")
-                print(f"   refresh_token: {'YES' if creds.get('refresh_token') else 'MISSING'}")
-                print(f"   expires_in: {creds.get('expiry', 'MISSING')}")
                 youtube_uploader = YouTubeUploader(
                     title,
                     video_path,
@@ -271,24 +261,26 @@ def process_form():
                 print(f"Ошибка загрузки на YouTube: {e}")
                 youtube_result = {'success': False, 'error': str(e)}
         
-        # Загрузка на VK
         if 'vk' in platforms:
             if 'vk_token' not in session:
                 return jsonify({'success': False, 'error': 'VK не авторизован'}), 400
             try:
-                vk_uploader = VK.VideoUploader(session['vk_token'])
-                vk_result = vk_uploader.upload_video(
-                    video_path=video_path,
-                    title=title,
-                    description=description,
-                    privacy_view=privacy,
-                    group_id=user.vk_group_id
+                vk_uploader = VKUploader(
+                    title,
+                    video_path,
+                    description,
+                    category,
+                    image_path,
+                    tags,
+                    privacy,
+                    user.vk_group_id,
+                    session['vk_token']
                 )
+                vk_result = vk_uploader.upload_video()
             except Exception as e:
                 print(f"Ошибка загрузки на VK: {e}")
                 vk_result = {'success': False, 'error': str(e)}
 
-        # Загрузка в Telegram
         if 'telegram' in platforms:
             try:
                 telegram_result = Telegram.upload_video(
@@ -301,7 +293,6 @@ def process_form():
                 print(f"Ошибка загрузки в Telegram: {e}")
                 telegram_result = {'success': False, 'error': str(e)}
 
-        # Проверяем, была ли хоть одна успешная загрузка
         all_results = [r for r in [youtube_result, vk_result, telegram_result] if r is not None]
         any_success = any(r.get('success', False) if isinstance(r, dict) else False for r in all_results)
 
@@ -331,7 +322,6 @@ def process_form():
             if path and os.path.exists(path):
                 try:
                     os.remove(path)
-                    print(f"🗑️ Удален временный файл: {path}")
                 except Exception as e:
                     print(f"⚠️ Не удалось удалить {path}: {e}")
 

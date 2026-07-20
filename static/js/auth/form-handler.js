@@ -34,10 +34,9 @@ window.submitForm = async function() {
     }
 
     // Авторизация VK (если выбрано)
-    if (document.querySelector('input[value="vk"]:checked')) {
+    if (document.querySelector('input[value="youtube"]:checked')) {
         try {
-            const vkAuth = new VKAuth(window.location.href);
-            await vkAuth.startAuth();
+            await connectVK();
         } catch (err) {
             showError('Не удалось авторизоваться в VK: ' + err.message);
             button.disabled = false;
