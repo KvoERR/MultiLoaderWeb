@@ -29,3 +29,13 @@ function toggleInfo(platform) {
     targetButton.style.backgroundColor = 'orange';
     targetButton.style.color = 'black';
 }
+
+window.activateButton = function(platform) {
+    const button = document.getElementById(`${platform}-button`);
+    if (button) {
+        button.style.backgroundColor = 'green';
+        button.style.color = 'white';
+        button.textContent = 'Привязано';
+        button.disabled = true;
+    }
+}

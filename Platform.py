@@ -2,12 +2,9 @@ import secrets
 import hashlib
 import base64
 import string
-from typing import List, Optional
+import urllib.parse
 import requests
-from flask import session
-
 from google_auth_oauthlib.flow import Flow
-
 
 class Platform:
     def __init__(self, code_verifier: str, client_id: str, client_secret: str, redirect_uri: str):
@@ -16,6 +13,7 @@ class Platform:
         self.client_id = client_id
         self.client_secret = client_secret
         self.redirect_uri = redirect_uri
+        self.state = self.generate_state()
 
     @staticmethod
     def generate_code_verifier() -> str:
@@ -26,7 +24,10 @@ class Platform:
     def generate_code_challenge(code_verifier: str) -> str:
         digest = hashlib.sha256(code_verifier.encode('utf-8')).digest()
         return base64.urlsafe_b64encode(digest).decode('utf-8').strip('=')
-
+    
+    @staticmethod
+    def generate_state() -> str:
+        return secrets.token_urlsafe(32)
 
 class YouTube(Platform):
     def __init__(self, code_verifier: str, client_id: str, client_secret: str, redirect_uri: str):
@@ -34,7 +35,6 @@ class YouTube(Platform):
 
     @property
     def scopes(self):
-        # YouTube требует список
         return ["https://www.googleapis.com/auth/youtube.upload"]
 
     def get_authorization_url(self):
@@ -48,7 +48,7 @@ class YouTube(Platform):
                     "redirect_uris": [self.redirect_uri]
                 }
             },
-            scopes=self.scopes,  # Список
+            scopes=self.scopes,
             redirect_uri=self.redirect_uri,
         )
         authorization_url, state = flow.authorization_url(
@@ -70,57 +70,75 @@ class YouTube(Platform):
                     "redirect_uris": [self.redirect_uri]
                 }
             },
-            scopes=self.scopes,  # Список
+            scopes=self.scopes,
             redirect_uri=self.redirect_uri,
         )
 
         flow.fetch_token(code=code, code_verifier=self.code_verifier)
         return flow.credentials
 
-
 class VK(Platform):
     def __init__(self, code_verifier: str, client_id: str, client_secret: str, redirect_uri: str):
         super().__init__(code_verifier, client_id, client_secret, redirect_uri)
 
-    @property
-    def scopes(self):
-        # VK требует строку через пробел
-        return "video groups wall"
-
-    @property
-    def auth_url(self):
-        return "https://oauth.vk.com/authorize"
-
-    @property
-    def token_url(self):
-        return "https://oauth.vk.com/access_token"
-
     def get_authorization_url(self) -> str:
+        """
+        Генерирует URL для авторизации VK ID.
+        ВАЖНО: Использует НОВЫЙ эндпоинт id.vk.ru
+        """
         params = {
             "client_id": self.client_id,
             "redirect_uri": self.redirect_uri,
             "response_type": "code",
-            "scope": self.scopes,
-            "v": "5.131"
+            "scope": "video groups wall", 
+            "code_challenge": self.code_challenge,
+            "code_challenge_method": "S256",
+            "state": self.state,
         }
-        import urllib.parse
-        query = urllib.parse.urlencode(params)
-        return f"{self.auth_url}?{query}"
-
-    def get_token(self, code: str) -> dict:
+        return f"https://id.vk.ru/authorize?{urllib.parse.urlencode(params)}"
+    
+    def get_token(self, code: str, device_id: str = None) -> dict:
+        """
+        Обменивает код на токены.
+        ВАЖНО: Использует НОВЫЙ эндпоинт id.vk.ru/oauth2/auth
+        и POST-запрос с данными в теле.
+        """
+        # Данные для POST-запроса (application/x-www-form-urlencoded)
         data = {
-            "client_id": self.client_id,
-            "client_secret": self.client_secret,
-            "redirect_uri": self.redirect_uri,
-            "code": code,
             "grant_type": "authorization_code",
-            "code_verifier": self.code_verifier
+            "client_id": self.client_id,
+            "client_secret": self.client_secret,  # Для конфиденциальных приложений
+            "code": code,
+            "code_verifier": self.code_verifier,  # Передаем оригинальный verifier
+            "redirect_uri": self.redirect_uri,
         }
-
-        response = requests.post(self.token_url, data=data)
-        result = response.json()
         
-        if 'error' in result:
-            raise Exception(f"VK OAuth error: {result.get('error_description', result.get('error'))}")
+        # device_id может быть получен из редиректа
+        if device_id:
+            data["device_id"] = device_id
         
-        return result
+        try:
+            response = requests.post(
+                "https://id.vk.ru/oauth2/auth",
+                data=data,  # requests сам закодирует как x-www-form-urlencoded
+                timeout=30
+            )
+            
+            print(f"VK token response status: {response.status_code}")
+            print(f"VK token response: {response.text}")
+            
+            if response.status_code != 200:
+                error_data = response.json()
+                error_msg = error_data.get('error_description', error_data.get('error', 'Unknown error'))
+                raise Exception(f"VK OAuth error: {error_msg}")
+            
+            result = response.json()
+            
+            if 'access_token' not in result:
+                raise Exception("No access_token in response")
+            
+            return result
+            
+        except requests.exceptions.RequestException as e:
+            print(f"Request error: {e}")
+            raise Exception(f"Network error: {str(e)}")

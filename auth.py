@@ -1,13 +1,10 @@
 from flask import request, jsonify, session, redirect, current_app, Blueprint
-from google_auth_oauthlib.flow import Flow
-import hashlib
-import base64
-import secrets
-import os
 import requests
+import secrets
+import urllib.parse
 import jwt
-from models import User, SessionLocal
 from Platform import Platform, YouTube, VK
+from models import User, SessionLocal
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -21,12 +18,11 @@ def youtube_login():
                       current_app.config["GOOGLE_CLIENT_SECRET"],
                       current_app.config["GOOGLE_REDIRECT_URI"])
     authorization_url, state = youtube.get_authorization_url()
-    session['youtube_state']=state
+    session['youtube_state'] = state
     return redirect(authorization_url)
 
 @auth_bp.route('/auth/youtube/callback')
 def youtube_callback():
-    # Проверяем state, который вернули
     state = session.get('youtube_state')
     if not state or state != request.args.get('state'):
         return jsonify({'error': 'Invalid state'}), 400
@@ -45,7 +41,6 @@ def youtube_callback():
                       current_app.config["GOOGLE_REDIRECT_URI"])
     creds = youtube.get_creds(code)
 
-    # TODO проверить безопасность
     session['youtube_creds'] = {
         'token': creds.token,
         'refresh_token': creds.refresh_token,
@@ -59,133 +54,72 @@ def youtube_callback():
 
     return redirect('/')
 
-@auth_bp.route('/auth/vk', methods=['POST'])
-def vk_auth():
-    data = request.get_json()
-    if not data:
-        return jsonify({'error': 'No data provided'}), 400
-
-    group_id = data.get('group_id', '').strip()
-    if not group_id:
-        return jsonify({'error': 'group_id is required'}), 400
-
-    token = request.headers.get('Authorization')
-    if not token or not token.startswith('Bearer '):
-        return jsonify({'error': 'Authentication required'}), 401
-
-    try:
-        payload = jwt.decode(token[7:], current_app.config['SECRET_KEY'], algorithms=['HS256'])
-        user_id = payload['user_id']
-    except jwt.InvalidTokenError:
-        return jsonify({'error': 'Invalid or expired token'}), 401
-
-    db = SessionLocal()
-    try:
-        user = db.query(User).filter(User.id == user_id).first()
-        if not user:
-            return jsonify({'error': 'User not found'}), 404
-        user.vk_group_id = group_id
-        db.commit()
-        return jsonify({'success': True}), 200
-    except Exception as e:
-        db.rollback()
-        return jsonify({'error': 'Database error'}), 500
-    finally:
-        db.close()
-
 @auth_bp.route('/auth/vk/login')
 def vk_login():
+    """Начало авторизации VK ID"""
+    # Создаем экземпляр VK (он сам сгенерирует code_verifier и state)
     code_verifier = Platform.generate_code_verifier()
-    session['vk_code_verifier'] = code_verifier
-
     vk = VK(code_verifier,
-                      current_app.config["GOOGLE_CLIENT_ID"],
-                      current_app.config["GOOGLE_CLIENT_SECRET"],
-                      current_app.config["GOOGLE_REDIRECT_URI"])
-    authorization_url, state = vk.get_authorization_url()
-    session['vk_state']=state
+        current_app.config["VK_CLIENT_ID"],
+        current_app.config["VK_CLIENT_SECRET"],
+        current_app.config["VK_REDIRECT_URI"]
+    )
+    
+    # Сохраняем параметры в сессии
+    session['vk_code_verifier'] = vk.code_verifier
+    session['vk_state'] = vk.state
+    
+    authorization_url = vk.get_authorization_url()
     return redirect(authorization_url)
 
-@auth_bp.route('/auth/vk/callback', methods=['POST'])
+@auth_bp.route('/auth/vk/callback')
 def vk_callback():
-    data = request.get_json()
-    if not data:
-        return jsonify({'error': 'No data provided'}), 400
+    """Callback после авторизации VK ID"""
+    # Проверяем state (защита от CSRF)
+    state = session.get('vk_state')
+    received_state = request.args.get('state')
+    
+    if not state or state != received_state:
+        return jsonify({'error': 'Invalid state'}), 400
+    
+    code = request.args.get('code')
+    if not code:
+        return jsonify({'error': 'Authorization code not found'}), 400
+    
+    # Получаем device_id из параметров (может быть не во всех случаях)
+    device_id = request.args.get('device_id')
+    
+    # Восстанавливаем code_verifier из сессии
+    code_verifier = session.get('vk_code_verifier')
+    if not code_verifier:
+        return jsonify({'error': 'Missing code verifier in session'}), 400
 
-    state = data.get('state')
-    code = data.get('code')
-    code_verifier = data.get('code_verifier')
-    device_id = data.get('device_id')
-
-    if not code or not code_verifier or not device_id:
-        return jsonify({'error': 'Missing required parameters'}), 400
-
+    # Создаем экземпляр VK с сохраненным code_verifier
+    vk = VK(
+        current_app.config["VK_CLIENT_ID"],
+        current_app.config["VK_CLIENT_SECRET"],
+        current_app.config["VK_REDIRECT_URI"],
+        code_verifier
+    )
+    
     try:
-        response = requests.post(
-            'https://id.vk.ru/oauth2/auth',
-            data={
-                'grant_type': 'authorization_code',
-                'code_verifier': code_verifier,
-                'redirect_uri': current_app.config['VK_REDIRECT_URI'],
-                'code': code,
-                'client_id': current_app.config['VK_APP_ID'],
-                'device_id': device_id,
-                'state': state
-            },
-            headers={'Content-Type': 'application/x-www-form-urlencoded'}
-        ).json()
-
-        session['vk_token'] = response['access_token']
-        return jsonify({'success': True, 'message': 'Authorized'})
+        token_data = vk.get_token(code, device_id)
+        
+        # Сохраняем токены в сессии
+        session['vk_token'] = token_data.get('access_token')
+        session['vk_refresh_token'] = token_data.get('refresh_token')  # Если есть
+        session['vk_user_id'] = token_data.get('user_id')
+        session['vk_device_id'] = device_id  # Сохраняем для будущих обновлений
+        session['vk_auth'] = True
+        
+        # Очищаем временные данные
+        session.pop('vk_state', None)
+        session.pop('vk_code_verifier', None)
+        
+        return redirect('/')
+        
     except Exception as e:
         print(f"Ошибка в /auth/vk/callback: {e}")
-        return jsonify({'error': 'Internal server error'}), 500
-
-@auth_bp.route('/auth/tg', methods=['POST'])
-def tg_auth():
-    data = request.get_json()
-    if not data:
-        return jsonify({'error': 'No data provided'}), 400
-
-    channel_name = data.get('channel_name', '').strip()
-    if not channel_name:
-        return jsonify({'error': 'Channel name is required'}), 400
-
-    # Получаем chat_id из Telegram
-    try:
-        response = requests.get(f"https://api.telegram.org/bot{current_app.config['TG_BOT_TOKEN']}/getUpdates").json()
-        chat_id = None
-        for update in response.get('result', []):
-            if 'channel_post' in update and update['channel_post'].get('text') == channel_name:
-                chat_id = update['channel_post']['chat']['id']
-                break
-        if not chat_id:
-            return jsonify({'error': 'Channel not found'}), 404
-    except Exception as e:
-        return jsonify({'error': 'Failed to connect to Telegram'}), 500
-
-    token = request.headers.get('Authorization')
-    if not token or not token.startswith('Bearer '):
-        return jsonify({'error': 'Authentication required'}), 401
-
-    try:
-        payload = jwt.decode(token[7:], current_app.config['SECRET_KEY'], algorithms=['HS256'])
-        user_id = payload['user_id']
-    except jwt.InvalidTokenError:
-        return jsonify({'error': 'Invalid or expired token'}), 401
-
-    db = SessionLocal()
-    try:
-        user = db.query(User).filter(User.id == user_id).first()
-        if not user:
-            return jsonify({'error': 'User not found'}), 404
-        user.tg_chat_id = chat_id
-        db.commit()
-        return jsonify({'success': True}), 200
-    except Exception as e:
-        db.rollback()
-        return jsonify({'error': 'Database error'}), 500
-    finally:
-        db.close()
+        return jsonify({'error': str(e)}), 500
 
 __all__ = ['auth_bp']

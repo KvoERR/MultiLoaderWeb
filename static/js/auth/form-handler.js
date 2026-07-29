@@ -1,16 +1,10 @@
-import { connectYouTube } from './youtube-auth.js';
-import { VKAuth } from './vk-auth.js';
-
-window.submitForm = async function() {
+window.submitForm = async function(event) {
     console.log('Кнопка нажата! Отправляем данные...');
     
-    // Находим элементы
     const form = document.getElementById('uploadForm');
     const resultDiv = document.getElementById('result');
-
-    const button = event.target; // Кнопка, на которую нажали
+    const button = event?.target || document.querySelector('button[onclick="submitForm()"]');
     
-    // Показываем загрузку
     button.disabled = true;
     button.textContent = 'Обработка...';
     
@@ -18,13 +12,27 @@ window.submitForm = async function() {
         resultDiv.style.display = 'none';
     }
 
-    // Собираем данные формы
-    const formData = new FormData(form);
+    const token = localStorage.getItem('token');
+    if (!token) {
+        alert('Вы не авторизованы');
+        button.disabled = false;
+        button.textContent = 'Обработать данные';
+        return;
+    }
+
+    // Проверяем выбранные платформы
+    const selectedPlatforms = document.querySelectorAll('input[name="platforms"]:checked');
+    if (selectedPlatforms.length === 0) {
+        alert('Выберите хотя бы одну платформу');
+        button.disabled = false;
+        button.textContent = 'Обработать данные';
+        return;
+    }
 
     // Авторизация YouTube (если выбрано)
     if (document.querySelector('input[value="youtube"]:checked')) {
         try {
-            await connectYouTube();
+            await window.authYouTube();
         } catch (err) {
             showError('Не удалось авторизоваться в YouTube: ' + err.message);
             button.disabled = false;
@@ -34,9 +42,9 @@ window.submitForm = async function() {
     }
 
     // Авторизация VK (если выбрано)
-    if (document.querySelector('input[value="youtube"]:checked')) {
+    if (document.querySelector('input[value="vk"]:checked')) {
         try {
-            await connectVK();
+            await window.authVK();
         } catch (err) {
             showError('Не удалось авторизоваться в VK: ' + err.message);
             button.disabled = false;
@@ -44,15 +52,8 @@ window.submitForm = async function() {
             return;
         }
     }
-
-    // Проверка токена
-    const token = localStorage.getItem('token');
-    if (!token) {
-        alert('Вы не авторизованы');
-        button.disabled = false;
-        button.textContent = 'Обработать данные';
-        return;
-    }
+    // Собираем данные формы
+    const formData = new FormData(form);
 
     fetch('/process', {
         method: 'POST',
@@ -87,7 +88,6 @@ window.submitForm = async function() {
     });
 }
 
-// Функция показа успешного результата
 function showSuccess(result) {
     const resultDiv = document.getElementById('result');
     if (!resultDiv) return;
@@ -95,15 +95,13 @@ function showSuccess(result) {
     resultDiv.className = 'result success';
     resultDiv.innerHTML = `
         <h3>✅ Данные успешно обработаны!</h3>
+        <p>${result || 'Видео отправлено на выбранные платформы'}</p>
         <p><small>Запрос обработан: ${new Date().toLocaleString()}</small></p>
     `;
     resultDiv.style.display = 'block';
-    
-    // Плавная прокрутка к результату
     resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-// Функция показа ошибки
 function showError(errorMessage) {
     const resultDiv = document.getElementById('result');
     if (!resultDiv) return;
@@ -114,7 +112,5 @@ function showError(errorMessage) {
         <p>${errorMessage}</p>
     `;
     resultDiv.style.display = 'block';
-    
-    // Плавная прокрутка к ошибке
     resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }

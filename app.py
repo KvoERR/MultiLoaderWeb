@@ -19,12 +19,14 @@ CORS(app)
 
 load_dotenv()
 app.config['TG_BOT_TOKEN'] = os.getenv('TG_BOT_TOKEN')
-app.config['VK_APP_ID'] = os.getenv('VK_APP_ID')
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 app.config['GOOGLE_CLIENT_ID'] = os.getenv('GOOGLE_CLIENT_ID')
-app.config['GOOGLE_REDIRECT_URI'] = os.getenv('GOOGLE_REDIRECT_URI')
 app.config['GOOGLE_CLIENT_SECRET'] = os.getenv('GOOGLE_CLIENT_SECRET')
+app.config['GOOGLE_REDIRECT_URI'] = os.getenv('GOOGLE_REDIRECT_URI')
+app.config['VK_CLIENT_ID'] = os.getenv('VK_CLIENT_ID')
+app.config['VK_CLIENT_SECRET'] = os.getenv('VK_CLIENT_SECRET')
 app.config['VK_REDIRECT_URI'] = os.getenv('VK_REDIRECT_URI')
+
 
 def get_file_path(file_storage):
     if not file_storage:

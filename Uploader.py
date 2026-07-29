@@ -7,9 +7,7 @@ from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from googleapiclient.errors import HttpError
 import vk_api
-from vk_api.upload import VkUpload
 
-# ===== SSL =====
 try:
     ssl._create_default_https_context = ssl.create_default_context()
 except AttributeError:
@@ -40,7 +38,6 @@ class Uploader:
 
     def upload_video(self):
         raise NotImplementedError
-
 
 class YouTubeUploader(Uploader):
     def __init__(self, title, video_path, description, category, image_path, tags, privacy, creds_dict):
@@ -208,7 +205,6 @@ class YouTubeUploader(Uploader):
             return {'success': False, 'error': f'Network error: {str(e)}'}
         except Exception as e:
             return {'success': False, 'error': str(e)}
-
 
 class VKUploader(Uploader):
     def __init__(self, title, video_path, description, category, image_path, tags, privacy, group_id=None, access_token=None):
